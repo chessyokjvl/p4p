@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P4P Management System</title>
+    <style>
+        /* สไตล์กล่อง Login ที่สวยงาม */
+        .login-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .login-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .login-box button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2 style="text-align: center;">เข้าสู่ระบบ P4P</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Log In</button>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden">
+        <nav id="sidebar">
+            <ul>
+                <li onclick="showPage('personnel')">จัดการบุคลากร</li>
+                <li onclick="showPage('scoring')">บันทึกคะแนน</li>
+                <li onclick="showPage('calculation')">คำนวณ/สรุปผล</li>
+            </ul>
+        </nav>
+        
+        <main id="content">
+            <div id="page-personnel" class="page hidden">หน้าจัดการบุคลากร...</div>
+            <div id="page-scoring" class="page hidden">หน้าบันทึกคะแนน P4P...</div>
+            <div id="page-calculation" class="page hidden">หน้าคำนวณและออกรายงาน...</div>
+        </main>
+    </div>
+
+    <script>
+        // รองรับการกด Enter เพื่อ Login
+        document.getElementById("password").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                login();
+            }
+        });
+
+        function login() {
+            // โค้ดสำหรับส่ง Fetch API ไปเช็คกับ App Script
+            // หากผ่าน ให้ซ่อน loginPage และแสดง appContainer
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            showPage('scoring'); // หน้าเริ่มต้นหลังเข้าสู่ระบบ
+        }
+
+        function showPage(pageId) {
+            // ซ่อนทุกหน้า
+            document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+            // แสดงหน้าที่เลือก
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
