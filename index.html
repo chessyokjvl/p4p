@@ -229,21 +229,27 @@
         }
 
         async function loadUsersToDropdown() {
-            const dropdown = document.getElementById('score-user');
-            
-            if(currentUser.role !== 'Admin') {
-                // ถ้าเป็น User ธรรมดา ล็อคให้เลือกได้แค่ตัวเอง
-                dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
-                dropdown.disabled = true;
-            } else {
-                // ถ้าเป็น Admin ดึงข้อมูลทุกคนมาให้เลือก
-                let data = await apiCall('getUsers', {});
-                if(data.status === 'success') {
-                    dropdown.innerHTML = data.data.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
-                    dropdown.disabled = false;
-                }
-            }
+    const dropdown = document.getElementById('score-user');
+    dropdown.innerHTML = '<option>กำลังโหลดข้อมูล...</option>'; // ขึ้นสถานะโหลดให้ผู้ใช้รู้
+    
+    // กรณีเป็น User ทั่วไป (ล็อคให้เลือกแค่ตัวเอง)
+    if(currentUser.role !== 'Admin') {
+        dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
+        dropdown.disabled = true;
+    } 
+    // กรณีเป็น Admin (ดึงข้อมูลทุกคนมาให้เลือก)
+    else {
+        let data = await apiCall('getUsers', {});
+        if(data.status === 'success' && data.data && data.data.length > 0) {
+            dropdown.innerHTML = data.data.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
+            dropdown.disabled = false;
+        } else {
+            // แจ้งเตือนหากดึงข้อมูลไม่ได้ หรือ Sheet ว่างเปล่า
+            dropdown.innerHTML = '<option value="">ไม่พบข้อมูลบุคลากรในฐานข้อมูล</option>';
+            Swal.fire('แจ้งเตือน', 'ไม่สามารถดึงข้อมูลรายชื่อได้ โปรดตรวจสอบหัวคอลัมน์ใน Google Sheet', 'warning');
         }
+    }
+}
 
         async function loadPersonnelTable() {
             let data = await apiCall('getUsers', {});
