@@ -39,7 +39,6 @@
                 <a href="#" onclick="switchPage('scoring')" class="nav-link block px-4 py-2 rounded bg-slate-700"><i class="fas fa-star w-6"></i> บันทึกคะแนน</a>
                 <a href="#" onclick="switchPage('personnel')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-users w-6"></i> จัดการบุคลากร</a>
                 <a href="#" onclick="switchPage('calculation')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-calculator w-6"></i> คำนวณค่าตอบแทน</a>
-                
                 <a href="#" onclick="logout()" class="block px-4 py-2 rounded hover:bg-red-600 mt-8 text-red-300"><i class="fas fa-sign-out-alt w-6"></i> ออกจากระบบ</a>
             </nav>
         </aside>
@@ -81,7 +80,9 @@
                         
                         <div class="mb-4">
                             <label class="block text-sm text-gray-600 mb-1">บุคลากร</label>
-                            <select id="score-user" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"></select>
+                            <select id="score-user" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500">
+                                <option>กำลังโหลดรายชื่อ...</option>
+                            </select>
                         </div>
 
                         <div class="mb-4">
@@ -93,7 +94,7 @@
                         </div>
 
                         <div id="form-raw-score" class="mb-4">
-                            <label class="block text-sm text-gray-600 mb-1">คะแนนดิบรวมรายเดือน (เตรียมรองรับระบบคำนวณรายกิจกรรม)</label>
+                            <label class="block text-sm text-gray-600 mb-1">คะแนนดิบรวมรายเดือน</label>
                             <input type="number" id="raw-score-input" class="w-full border rounded p-2 bg-blue-50" placeholder="กรอกคะแนนรวม">
                         </div>
 
@@ -126,7 +127,9 @@
                                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">จัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="personnel-tbody" class="divide-y divide-gray-200"></tbody>
+                            <tbody id="personnel-tbody" class="divide-y divide-gray-200">
+                                <tr><td colspan="4" class="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -172,7 +175,8 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         
-        let currentUser = null; // เก็บข้อมูลผู้ใช้ที่ Login
+        let currentUser = null; 
+        let cachedUsers = []; // เก็บรายชื่อไว้ในหน่วยความจำ ไม่ต้องดึงซ้ำ
 
         document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
 
@@ -195,16 +199,13 @@
             
             let data = await apiCall('login', { username: user, password: pass });
             if(data.status === 'success') {
-                currentUser = data.user; // เก็บตัวแปร Global
+                currentUser = data.user;
                 
-                // อัปเดต UI หน้าจอ
                 document.getElementById('display-name').innerText = currentUser.name;
                 document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
                 document.getElementById('user-role-badge').innerText = currentUser.role || 'User';
                 
-                // จัดการ Role Based Access Control (RBAC)
                 if(currentUser.role !== 'Admin') {
-                    // ปิดเมนูของ Admin
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 } else {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
@@ -214,11 +215,67 @@
                 document.getElementById('main-app').classList.remove('hidden');
                 
                 switchPage('scoring');
-                loadUsersToDropdown();
-                if(currentUser.role === 'Admin') loadPersonnelTable();
+                
+                // สั่งโหลดรายชื่อ 1 ครั้งหลังจากเข้าสู่ระบบ
+                await fetchAndDistributeUsersData();
                 
             } else {
                 Swal.fire('ผิดพลาด', data.message, 'error');
+            }
+        }
+
+        // ฟังก์ชันโหลดข้อมูลครั้งเดียวจบ
+        async function fetchAndDistributeUsersData() {
+            if (currentUser.role === 'Admin') {
+                // Admin ต้องดึงข้อมูลทุกคน
+                let data = await apiCall('getUsers', {});
+                if(data.status === 'success' && data.data) {
+                    // กรองแถวที่ว่างเปล่าใน Google Sheet ทิ้ง
+                    cachedUsers = data.data.filter(u => u.user_id && u.name);
+                } else {
+                    cachedUsers = [];
+                    Swal.fire('แจ้งเตือน', 'ไม่พบรายชื่อในฐานข้อมูล', 'warning');
+                }
+            }
+            
+            // แจกจ่ายข้อมูลที่ดึงมาไปใส่ใน Dropdown และ Table
+            renderDropdown();
+            if(currentUser.role === 'Admin') renderTable();
+        }
+
+        function renderDropdown() {
+            const dropdown = document.getElementById('score-user');
+            
+            if(currentUser.role !== 'Admin') {
+                // User ธรรมดา ล็อคให้เลือกได้แค่ตัวเอง
+                dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
+                dropdown.disabled = true;
+            } else {
+                // Admin ใช้ข้อมูลจาก cachedUsers
+                if(cachedUsers.length > 0) {
+                    dropdown.innerHTML = cachedUsers.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
+                    dropdown.disabled = false;
+                } else {
+                    dropdown.innerHTML = `<option value="">-- ไม่พบข้อมูล --</option>`;
+                }
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('personnel-tbody');
+            if(cachedUsers.length > 0) {
+                tbody.innerHTML = cachedUsers.map(u => `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'Admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <button class="text-blue-600 hover:text-blue-900 mx-1 bg-blue-100 p-2 rounded-full" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่มีข้อมูลบุคลากร</td></tr>`;
             }
         }
 
@@ -226,45 +283,6 @@
             let isP4P = document.getElementById('score-status').value === 'ได้รับ P4P';
             document.getElementById('form-raw-score').classList.toggle('hidden', !isP4P);
             document.getElementById('form-reason').classList.toggle('hidden', isP4P);
-        }
-
-        async function loadUsersToDropdown() {
-    const dropdown = document.getElementById('score-user');
-    dropdown.innerHTML = '<option>กำลังโหลดข้อมูล...</option>'; // ขึ้นสถานะโหลดให้ผู้ใช้รู้
-    
-    // กรณีเป็น User ทั่วไป (ล็อคให้เลือกแค่ตัวเอง)
-    if(currentUser.role !== 'Admin') {
-        dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
-        dropdown.disabled = true;
-    } 
-    // กรณีเป็น Admin (ดึงข้อมูลทุกคนมาให้เลือก)
-    else {
-        let data = await apiCall('getUsers', {});
-        if(data.status === 'success' && data.data && data.data.length > 0) {
-            dropdown.innerHTML = data.data.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
-            dropdown.disabled = false;
-        } else {
-            // แจ้งเตือนหากดึงข้อมูลไม่ได้ หรือ Sheet ว่างเปล่า
-            dropdown.innerHTML = '<option value="">ไม่พบข้อมูลบุคลากรในฐานข้อมูล</option>';
-            Swal.fire('แจ้งเตือน', 'ไม่สามารถดึงข้อมูลรายชื่อได้ โปรดตรวจสอบหัวคอลัมน์ใน Google Sheet', 'warning');
-        }
-    }
-}
-
-        async function loadPersonnelTable() {
-            let data = await apiCall('getUsers', {});
-            if(data.status === 'success') {
-                document.getElementById('personnel-tbody').innerHTML = data.data.map(u => `
-                    <tr class="hover:bg-gray-50 border-b">
-                        <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'Admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <button class="text-blue-600 hover:text-blue-900 mx-1" title="แก้ไข"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
         }
 
         async function submitScore() {
@@ -279,7 +297,7 @@
             let res = await apiCall('saveScore', payload);
             if(res.status === 'success') {
                 Swal.fire('สำเร็จ', res.message, 'success');
-                document.getElementById('raw-score-input').value = ''; // เคลียร์ช่อง
+                document.getElementById('raw-score-input').value = ''; 
             } else {
                 Swal.fire('ผิดพลาด', res.message, 'error');
             }
@@ -306,7 +324,6 @@
             }
         }
 
-        // UI Routing
         function switchPage(pageId) {
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
             document.getElementById('page-' + pageId).classList.remove('hidden');
@@ -326,6 +343,7 @@
 
         function logout() {
             currentUser = null;
+            cachedUsers = [];
             document.getElementById('login-page').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('username').value = ''; document.getElementById('password').value = '';
