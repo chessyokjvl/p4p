@@ -58,7 +58,9 @@
                 
                 <div id="page-scoring" class="page">
                     <div class="bg-white p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2">บันทึกคะแนนประจำเดือน</h2>
+                        <div class="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <p class="text-sm text-yellow-700"><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> การกรอกซ้ำในเดือนเดิม ระบบจะถือเป็นการ "แก้ไข" ข้อมูลเดิม</p>
+                        </div>
                         
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
@@ -80,7 +82,7 @@
                         
                         <div class="mb-4">
                             <label class="block text-sm text-gray-600 mb-1">บุคลากร</label>
-                            <select id="score-user" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500">
+                            <select id="score-user" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500">
                                 <option>กำลังโหลดรายชื่อ...</option>
                             </select>
                         </div>
@@ -101,14 +103,16 @@
                         <div id="form-reason" class="mb-4 hidden">
                             <label class="block text-sm text-gray-600 mb-1">เหตุผล</label>
                             <select id="reason-input" class="w-full border rounded p-2">
-                                <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน</option>
-                                <option value="ไม่ส่ง">ไม่ส่ง</option>
-                                <option value="เรียน PG">เรียน PG</option>
+                                <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน (นับอัตรากำลังกลุ่ม)</option>
+                                <option value="ไม่ส่ง">ไม่ส่งคะแนน (นับอัตรากำลังกลุ่ม)</option>
+                                <option value="ลาศึกษาต่อ (เรียน PG)">ลาศึกษาต่อ (ตัดออกจากอัตรากำลัง)</option>
+                                <option value="ยังไม่เริ่มปฏิบัติงาน">ยังไม่เริ่มปฏิบัติงาน (ตัดออกจากอัตรากำลัง)</option>
+                                <option value="ออกจากงานไปแล้ว">ออกจากงานไปแล้ว (ตัดออกจากอัตรากำลัง)</option>
                                 <option value="อื่นๆ">อื่นๆ</option>
                             </select>
                         </div>
 
-                        <button onclick="submitScore()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition shadow-md">บันทึกคะแนน</button>
+                        <button onclick="submitScore()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition shadow-md">บันทึกข้อมูล</button>
                     </div>
                 </div>
 
@@ -176,7 +180,7 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         
         let currentUser = null; 
-        let cachedUsers = []; // เก็บรายชื่อไว้ในหน่วยความจำ ไม่ต้องดึงซ้ำ
+        let cachedUsers = [];
 
         document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
 
@@ -188,7 +192,8 @@
                 return await res.json();
             } catch (error) {
                 Swal.close();
-                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบฐานข้อมูลได้" };
+                console.error(error);
+                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้ ตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต" };
             }
         }
 
@@ -205,7 +210,7 @@
                 document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
                 document.getElementById('user-role-badge').innerText = currentUser.role || 'User';
                 
-                if(currentUser.role !== 'Admin') {
+                if(String(currentUser.role).toLowerCase() !== 'admin') {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 } else {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
@@ -216,7 +221,7 @@
                 
                 switchPage('scoring');
                 
-                // สั่งโหลดรายชื่อ 1 ครั้งหลังจากเข้าสู่ระบบ
+                // โหลดรายชื่อทันที
                 await fetchAndDistributeUsersData();
                 
             } else {
@@ -224,58 +229,42 @@
             }
         }
 
-        // ฟังก์ชันโหลดข้อมูลครั้งเดียวจบ
         async function fetchAndDistributeUsersData() {
-            if (currentUser.role === 'Admin') {
-                // Admin ต้องดึงข้อมูลทุกคน
-                let data = await apiCall('getUsers', {});
-                if(data.status === 'success' && data.data) {
-                    // กรองแถวที่ว่างเปล่าใน Google Sheet ทิ้ง
-                    cachedUsers = data.data.filter(u => u.user_id && u.name);
-                } else {
-                    cachedUsers = [];
-                    Swal.fire('แจ้งเตือน', 'ไม่พบรายชื่อในฐานข้อมูล', 'warning');
-                }
-            }
-            
-            // แจกจ่ายข้อมูลที่ดึงมาไปใส่ใน Dropdown และ Table
-            renderDropdown();
-            if(currentUser.role === 'Admin') renderTable();
-        }
-
-        function renderDropdown() {
             const dropdown = document.getElementById('score-user');
-            
-            if(currentUser.role !== 'Admin') {
-                // User ธรรมดา ล็อคให้เลือกได้แค่ตัวเอง
-                dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
-                dropdown.disabled = true;
-            } else {
-                // Admin ใช้ข้อมูลจาก cachedUsers
-                if(cachedUsers.length > 0) {
+            dropdown.innerHTML = '<option>กำลังโหลดรายชื่อ...</option>';
+
+            if (String(currentUser.role).toLowerCase() === 'admin') {
+                let data = await apiCall('getUsers', {});
+                if(data.status === 'success' && data.data && data.data.length > 0) {
+                    cachedUsers = data.data.filter(u => u.user_id && u.name); // กรองแถวว่างทิ้ง
+                    
+                    // กระจายเข้า Dropdown
                     dropdown.innerHTML = cachedUsers.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
                     dropdown.disabled = false;
-                } else {
-                    dropdown.innerHTML = `<option value="">-- ไม่พบข้อมูล --</option>`;
-                }
-            }
-        }
 
-        function renderTable() {
-            const tbody = document.getElementById('personnel-tbody');
-            if(cachedUsers.length > 0) {
-                tbody.innerHTML = cachedUsers.map(u => `
-                    <tr class="hover:bg-gray-50 border-b">
-                        <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'Admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <button class="text-blue-600 hover:text-blue-900 mx-1 bg-blue-100 p-2 rounded-full" title="แก้ไข"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
+                    // กระจายเข้าตารางจัดการบุคลากร
+                    document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => `
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${String(u.role).toLowerCase() === 'admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <button class="text-blue-600 hover:text-blue-900 mx-1 bg-blue-100 p-2 rounded-full" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                } else {
+                    cachedUsers = [];
+                    dropdown.innerHTML = '<option value="">-- ไม่พบข้อมูลในฐานข้อมูล --</option>';
+                    document.getElementById('personnel-tbody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">API ส่งค่าว่างเปล่า โปรดตรวจสอบหัวคอลัมน์ใน Sheet</td></tr>`;
+                    Swal.fire('แจ้งเตือน', data.message || 'ดึงรายชื่อไม่สำเร็จ', 'warning');
+                }
             } else {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่มีข้อมูลบุคลากร</td></tr>`;
+                // ถ้าเป็น User ธรรมดา
+                dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
+                dropdown.disabled = true;
+                dropdown.classList.add('bg-gray-100');
             }
         }
 
@@ -318,7 +307,7 @@
                         <td class="px-4 py-3 text-right font-bold text-green-600 text-base">${r.pay}</td>
                     </tr>
                 `).join('');
-                document.getElementById('calc-tbody').innerHTML = html || `<tr><td colspan="5" class="text-center py-6 text-red-500 font-bold">ไม่พบข้อมูลคะแนน</td></tr>`;
+                document.getElementById('calc-tbody').innerHTML = html || `<tr><td colspan="5" class="text-center py-6 text-red-500 font-bold">ไม่พบข้อมูลคะแนน หรือไม่มีอัตรากำลังที่คำนวณได้</td></tr>`;
             } else {
                 Swal.fire('ข้อผิดพลาด', res.message, 'error');
             }
