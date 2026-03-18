@@ -7,9 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap');
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        /* ปรับแต่ง Tom Select ให้เข้ากับ Tailwind */
+        .ts-control { padding: 0.5rem 0.75rem; border-radius: 0.5rem; border-color: #e5e7eb; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -37,8 +43,9 @@
             </div>
             <nav class="p-4 space-y-2">
                 <a href="#" onclick="switchPage('scoring')" class="nav-link block px-4 py-2 rounded bg-slate-700"><i class="fas fa-star w-6"></i> บันทึกคะแนน</a>
-                <a href="#" onclick="switchPage('personnel')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-users w-6"></i> จัดการบุคลากร</a>
+                <a href="#" onclick="switchPage('budget')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-coins w-6"></i> ตั้งค่างบประมาณ</a>
                 <a href="#" onclick="switchPage('calculation')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-calculator w-6"></i> คำนวณค่าตอบแทน</a>
+                <a href="#" onclick="switchPage('personnel')" class="nav-link admin-only block px-4 py-2 rounded hover:bg-slate-700"><i class="fas fa-users w-6"></i> จัดการบุคลากร</a>
                 <a href="#" onclick="logout()" class="block px-4 py-2 rounded hover:bg-red-600 mt-8 text-red-300"><i class="fas fa-sign-out-alt w-6"></i> ออกจากระบบ</a>
             </nav>
         </aside>
@@ -56,12 +63,36 @@
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
                 
+                <div id="page-budget" class="page hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-sm max-w-xl mx-auto">
+                        <h2 class="text-xl font-bold mb-4 border-b pb-2">ตั้งค่างบประมาณรวมของโรงพยาบาล</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">เดือน</label>
+                                <select id="budget-month" class="w-full border rounded p-2">
+                                    <option value="10" selected>ตุลาคม</option><option value="11">พฤศจิกายน</option>
+                                    <option value="12">ธันวาคม</option><option value="01">มกราคม</option>
+                                    <option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option>
+                                    <option value="04">เมษายน</option><option value="05">พฤษภาคม</option>
+                                    <option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option>
+                                    <option value="08">สิงหาคม</option><option value="09">กันยายน</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">ปี (พ.ศ.)</label>
+                                <input type="number" id="budget-year" class="w-full border rounded p-2" value="2568">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 mb-1">จำนวนเงินงบประมาณรวม (บาท)</label>
+                            <input type="number" id="budget-amount" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500" placeholder="เช่น 171153">
+                        </div>
+                        <button onclick="submitBudget()" class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition shadow">บันทึกงบประมาณ</button>
+                    </div>
+                </div>
+
                 <div id="page-scoring" class="page">
                     <div class="bg-white p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
-                        <div class="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                            <p class="text-sm text-yellow-700"><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> การกรอกซ้ำในเดือนเดิม ระบบจะถือเป็นการ "แก้ไขทับ" ข้อมูลเดิม</p>
-                        </div>
-                        
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm text-gray-600 mb-1">เดือน</label>
@@ -80,11 +111,16 @@
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-600 mb-1">บุคลากร</label>
-                            <select id="score-user" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500">
-                                <option>กำลังโหลดรายชื่อ...</option>
+                        <div id="group-filter-container" class="mb-4 hidden">
+                            <label class="block text-sm text-gray-600 mb-1">กรองตามกลุ่มงาน</label>
+                            <select id="score-group-filter" class="w-full border rounded p-2" onchange="filterUsersByGroup()">
+                                <option value="ALL">-- แสดงทุกกลุ่ม --</option>
                             </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 mb-1">ค้นหาบุคลากร (พิมพ์ชื่อได้เลย)</label>
+                            <select id="score-user" class="w-full" placeholder="เลือกหรือพิมพ์ค้นหาบุคลากร..."></select>
                         </div>
 
                         <div class="mb-4">
@@ -96,15 +132,15 @@
                         </div>
 
                         <div id="form-raw-score" class="mb-4">
-                            <label class="block text-sm text-gray-600 mb-1">คะแนนดิบรวมรายเดือน</label>
-                            <input type="number" id="raw-score-input" class="w-full border rounded p-2 bg-blue-50" placeholder="กรอกคะแนนรวม">
+                            <label class="block text-sm text-gray-600 mb-1">คะแนนดิบรวม</label>
+                            <input type="number" id="raw-score-input" class="w-full border rounded p-2 bg-blue-50">
                         </div>
 
                         <div id="form-reason" class="mb-4 hidden">
                             <label class="block text-sm text-gray-600 mb-1">เหตุผล</label>
                             <select id="reason-input" class="w-full border rounded p-2">
-                                <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน (นับอัตรากำลังกลุ่ม)</option>
-                                <option value="ไม่ส่ง">ไม่ส่งคะแนน (นับอัตรากำลังกลุ่ม)</option>
+                                <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน (นับอัตรากำลัง)</option>
+                                <option value="ไม่ส่ง">ไม่ส่ง (นับอัตรากำลัง)</option>
                                 <option value="ลาศึกษาต่อ (เรียน PG)">ลาศึกษาต่อ (ตัดออกจากอัตรากำลัง)</option>
                                 <option value="ยังไม่เริ่มปฏิบัติงาน">ยังไม่เริ่มปฏิบัติงาน (ตัดออกจากอัตรากำลัง)</option>
                                 <option value="ออกจากงานไปแล้ว">ออกจากงานไปแล้ว (ตัดออกจากอัตรากำลัง)</option>
@@ -112,35 +148,13 @@
                             </select>
                         </div>
 
-                        <button onclick="submitScore()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition shadow-md">บันทึกข้อมูล</button>
-                    </div>
-                </div>
-
-                <div id="page-personnel" class="page hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">จัดการบุคลากร</h2>
-                        <button class="bg-green-600 text-white px-4 py-2 rounded text-sm shadow hover:bg-green-700"><i class="fas fa-plus mr-1"></i> เพิ่มบุคลากร</button>
-                    </div>
-                    <div class="bg-white rounded-lg shadow-sm overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead class="bg-gray-50 border-b">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ชื่อ-สกุล</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">กลุ่มงาน</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">สิทธิ์</th>
-                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="personnel-tbody" class="divide-y divide-gray-200">
-                                <tr><td colspan="4" class="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
-                            </tbody>
-                        </table>
+                        <button onclick="submitScore()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition">บันทึกข้อมูล</button>
                     </div>
                 </div>
 
                 <div id="page-calculation" class="page hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">สรุปผลยอดเงินรวม 100%</h2>
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-2">
+                        <h2 class="text-xl font-bold">สรุปผลการคำนวณ 90/10</h2>
                         <div class="flex items-center">
                             <select id="calc-month" class="border rounded p-1 text-sm mr-1">
                                 <option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option>
@@ -149,23 +163,69 @@
                                 <option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option>
                             </select>
                             <input type="number" id="calc-year" class="border rounded p-1 text-sm w-20" value="2568">
-                            <button onclick="runCalculation()" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 ml-2 shadow"><i class="fas fa-play mr-1"></i> ประมวลผล</button>
+                            <button onclick="runCalculation()" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 ml-2"><i class="fas fa-play mr-1"></i> ประมวลผล</button>
                         </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-lg font-bold mb-2 text-indigo-800"><i class="fas fa-layer-group"></i> สรุปเงินก้อนกลุ่ม (งบรวม: <span id="display-total-budget">0</span> บาท)</h3>
+                        <div class="bg-white rounded-lg shadow-sm overflow-x-auto border border-gray-200">
+                            <table class="min-w-full text-xs md:text-sm whitespace-nowrap">
+                                <thead class="bg-yellow-200 border-b border-gray-300">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left font-bold text-gray-800 border-r">กลุ่ม</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r">สัดส่วน</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r">จำนวน</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r">จำนวนxสัดส่วน</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r bg-blue-100">เงินก้อนกลุ่ม</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r">90%</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 border-r">10%</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800 bg-green-100 border-r">รวมจ่ายจริง</th>
+                                        <th class="px-3 py-2 text-right font-bold text-gray-800">Check (=0)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summary-tbody" class="divide-y divide-gray-200">
+                                    <tr><td colspan="9" class="text-center py-4 text-gray-500">กดประมวลผลเพื่อดึงข้อมูล</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold mb-2 text-indigo-800"><i class="fas fa-user-md"></i> รายละเอียดรายบุคคล</h3>
+                        <div class="bg-white rounded-lg shadow-sm overflow-x-auto border border-gray-200">
+                            <table class="min-w-full text-sm whitespace-nowrap">
+                                <thead class="bg-indigo-50 border-b">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-medium text-indigo-800">กลุ่มงาน</th>
+                                        <th class="px-4 py-3 text-left font-medium text-indigo-800">ชื่อ-สกุล</th>
+                                        <th class="px-4 py-3 text-right font-medium text-indigo-800">คะแนนดิบ</th>
+                                        <th class="px-4 py-3 text-right font-medium text-indigo-800">คะแนนปรับฐาน</th>
+                                        <th class="px-4 py-3 text-right font-medium text-indigo-800">ยอดเงินที่ได้รับ (บาท)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calc-tbody" class="divide-y divide-gray-200">
+                                    <tr><td colspan="5" class="text-center py-4 text-gray-500">รอการประมวลผล</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-personnel" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">จัดการบุคลากร</h2>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded text-sm shadow"><i class="fas fa-plus mr-1"></i> เพิ่มบุคลากร</button>
                     </div>
                     <div class="bg-white rounded-lg shadow-sm overflow-x-auto">
                         <table class="min-w-full text-sm">
-                            <thead class="bg-indigo-50 border-b">
+                            <thead class="bg-gray-50 border-b">
                                 <tr>
-                                    <th class="px-4 py-3 text-left font-medium text-indigo-800">กลุ่มงาน</th>
-                                    <th class="px-4 py-3 text-left font-medium text-indigo-800">ชื่อ-สกุล</th>
-                                    <th class="px-4 py-3 text-right font-medium text-indigo-800">คะแนนดิบ</th>
-                                    <th class="px-4 py-3 text-right font-medium text-indigo-800">คะแนนปรับฐาน</th>
-                                    <th class="px-4 py-3 text-right font-medium text-indigo-800">ยอดเงินที่ได้รับ (บาท)</th>
+                                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">ชื่อ-สกุล</th>
+                                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">กลุ่มงาน</th>
                                 </tr>
                             </thead>
-                            <tbody id="calc-tbody" class="divide-y divide-gray-200">
-                                <tr><td colspan="5" class="text-center py-6 text-gray-500">เลือกเดือนและปี แล้วกดปุ่ม "ประมวลผล"</td></tr>
-                            </tbody>
+                            <tbody id="personnel-tbody" class="divide-y divide-gray-200"></tbody>
                         </table>
                     </div>
                 </div>
@@ -177,11 +237,12 @@
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
 
     <script>
-        // ใช้ URL ของคุณ
+        // ใส่ URL ที่ Deploy ล่าสุด
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         
         let currentUser = null; 
         let cachedUsers = [];
+        let tomSelectInstance = null; // เก็บตัวแปร Tom Select
 
         document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
 
@@ -193,7 +254,6 @@
                 return await res.json();
             } catch (error) {
                 Swal.close();
-                console.error(error);
                 return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้" };
             }
         }
@@ -201,76 +261,76 @@
         async function login() {
             let user = document.getElementById('username').value;
             let pass = document.getElementById('password').value;
-            if(!user || !pass) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+            if(!user || !pass) return Swal.fire('แจ้ง', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
             
             let data = await apiCall('login', { username: user, password: pass });
             if(data.status === 'success') {
                 currentUser = data.user;
-                
                 document.getElementById('display-name').innerText = currentUser.name;
                 document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
                 document.getElementById('user-role-badge').innerText = currentUser.role || 'User';
                 
                 let isAdmin = String(currentUser.role || '').trim().toLowerCase() === 'admin';
-                
-                if(!isAdmin) {
-                    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-                } else {
+                if(!isAdmin) document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                else {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    document.getElementById('group-filter-container').classList.remove('hidden');
                 }
 
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 
-                // แก้บั๊กแล้ว: เรียกฟังก์ชัน switchPage แบบไม่สน event
                 switchPage('scoring');
-                
-                // โหลดรายชื่อทันที
                 await fetchAndDistributeUsersData();
-                
             } else {
                 Swal.fire('ผิดพลาด', data.message, 'error');
             }
         }
 
         async function fetchAndDistributeUsersData() {
-            const dropdown = document.getElementById('score-user');
-            dropdown.innerHTML = '<option>กำลังโหลดรายชื่อ...</option>';
-
             let isAdmin = String(currentUser.role || '').trim().toLowerCase() === 'admin';
 
             if (isAdmin) {
                 let data = await apiCall('getUsers', {});
-                if(data.status === 'success' && data.data && data.data.length > 0) {
-                    cachedUsers = data.data.filter(u => u.user_id && u.name); // กรองแถวว่างทิ้ง
+                if(data.status === 'success') {
+                    cachedUsers = data.data.filter(u => u.user_id && u.name);
                     
-                    // กระจายเข้า Dropdown
-                    dropdown.innerHTML = cachedUsers.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
-                    dropdown.disabled = false;
+                    // สร้าง Group Filter
+                    let groups = [...new Set(cachedUsers.map(u => u.group_name))];
+                    let groupFilter = document.getElementById('score-group-filter');
+                    groupFilter.innerHTML = `<option value="ALL">-- แสดงทุกกลุ่ม --</option>` + groups.map(g => `<option value="${g}">${g}</option>`).join('');
 
-                    // กระจายเข้าตารางจัดการบุคลากร
-                    document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => `
-                        <tr class="hover:bg-gray-50 border-b">
-                            <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${String(u.role).trim().toLowerCase() === 'admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <button class="text-blue-600 hover:text-blue-900 mx-1 bg-blue-100 p-2 rounded-full" title="แก้ไข"><i class="fas fa-edit"></i></button>
-                            </td>
-                        </tr>
-                    `).join('');
-
-                } else {
-                    cachedUsers = [];
-                    dropdown.innerHTML = '<option value="">-- ไม่พบข้อมูลในฐานข้อมูล --</option>';
-                    document.getElementById('personnel-tbody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่พบรายชื่อ โปรดตรวจสอบ Sheet</td></tr>`;
+                    initTomSelect(cachedUsers);
+                    
+                    document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => `<tr class="border-b"><td class="px-6 py-3">${u.name}</td><td class="px-6 py-3">${u.group_name}</td></tr>`).join('');
                 }
             } else {
-                // ถ้าเป็น User ธรรมดา ล็อคให้เลือกได้แค่ตัวเอง
-                dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
-                dropdown.disabled = true;
-                dropdown.classList.add('bg-gray-100');
+                initTomSelect([{ user_id: currentUser.id, name: currentUser.name, group_name: currentUser.group }], true);
             }
+        }
+
+        // ระบบ Tom Select
+        function initTomSelect(usersArray, lock = false) {
+            if (tomSelectInstance) {
+                tomSelectInstance.destroy(); // ล้างของเก่าทิ้งก่อน
+            }
+            
+            let selectEl = document.getElementById('score-user');
+            selectEl.innerHTML = usersArray.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
+            
+            tomSelectInstance = new TomSelect(selectEl, {
+                create: false,
+                sortField: { field: "text", direction: "asc" },
+                placeholder: "พิมพ์ค้นหาชื่อบุคลากร..."
+            });
+
+            if (lock) tomSelectInstance.disable();
+        }
+
+        function filterUsersByGroup() {
+            let selectedGroup = document.getElementById('score-group-filter').value;
+            let filtered = selectedGroup === "ALL" ? cachedUsers : cachedUsers.filter(u => u.group_name === selectedGroup);
+            initTomSelect(filtered);
         }
 
         function toggleScoreForm() {
@@ -292,9 +352,25 @@
             if(res.status === 'success') {
                 Swal.fire('สำเร็จ', res.message, 'success');
                 document.getElementById('raw-score-input').value = ''; 
-            } else {
-                Swal.fire('ผิดพลาด', res.message, 'error');
-            }
+                if(tomSelectInstance) tomSelectInstance.clear();
+            } else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        async function submitBudget() {
+            let payload = {
+                month: document.getElementById('budget-month').value,
+                year: document.getElementById('budget-year').value,
+                amount: document.getElementById('budget-amount').value
+            };
+            if(!payload.amount) return Swal.fire('แจ้ง', 'กรุณาระบุจำนวนเงิน', 'warning');
+            
+            let res = await apiCall('saveBudget', payload);
+            if(res.status === 'success') Swal.fire('สำเร็จ', res.message, 'success');
+            else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         async function runCalculation() {
@@ -303,60 +379,61 @@
             
             let res = await apiCall('calculate', { month, year });
             if(res.status === 'success') {
-                let html = res.data.map(r => `
+                document.getElementById('display-total-budget').innerText = formatNumber(res.totalBudget);
+
+                // เรนเดอร์ตารางสรุปกลุ่ม
+                let sumHtml = res.summary.map(s => {
+                    let checkVal = Math.round(s.check * 100) / 100; // ตัดเศษป้องกัน float error
+                    let checkClass = Math.abs(checkVal) > 1 ? 'text-red-600 font-bold' : '';
+                    return `
                     <tr class="hover:bg-gray-50 border-b">
-                        <td class="px-4 py-3">${r.group}</td>
-                        <td class="px-4 py-3">${r.name}</td>
-                        <td class="px-4 py-3 text-right text-gray-600">${r.raw}</td>
-                        <td class="px-4 py-3 text-right text-blue-600">${r.adjusted}</td>
-                        <td class="px-4 py-3 text-right font-bold text-green-600 text-base">${r.pay}</td>
+                        <td class="px-3 py-2 border-r">${s.group}</td>
+                        <td class="px-3 py-2 text-right border-r">${s.weight}</td>
+                        <td class="px-3 py-2 text-right border-r">${s.count}</td>
+                        <td class="px-3 py-2 text-right border-r">${s.weighted_count}</td>
+                        <td class="px-3 py-2 text-right border-r font-medium text-blue-700">${formatNumber(s.group_money)}</td>
+                        <td class="px-3 py-2 text-right border-r text-gray-600">${formatNumber(s.pool90)}</td>
+                        <td class="px-3 py-2 text-right border-r text-gray-600">${formatNumber(s.pool10)}</td>
+                        <td class="px-3 py-2 text-right border-r font-bold text-green-700 bg-green-50">${formatNumber(s.actual_pay)}</td>
+                        <td class="px-3 py-2 text-right ${checkClass}">${checkVal}</td>
+                    </tr>
+                `}).join('');
+                document.getElementById('summary-tbody').innerHTML = sumHtml;
+
+                // เรนเดอร์ตารางรายบุคคล
+                let indHtml = res.data.map(r => `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="px-4 py-2">${r.group}</td>
+                        <td class="px-4 py-2">${r.name}</td>
+                        <td class="px-4 py-2 text-right text-gray-600">${r.raw}</td>
+                        <td class="px-4 py-2 text-right text-blue-600">${r.adjusted}</td>
+                        <td class="px-4 py-2 text-right font-bold text-green-600">${r.pay}</td>
                     </tr>
                 `).join('');
-                document.getElementById('calc-tbody').innerHTML = html || `<tr><td colspan="5" class="text-center py-6 text-red-500 font-bold">ไม่พบข้อมูลคะแนน หรือไม่มีอัตรากำลังที่คำนวณได้</td></tr>`;
+                document.getElementById('calc-tbody').innerHTML = indHtml || `<tr><td colspan="5" class="text-center py-4">ไม่พบข้อมูล</td></tr>`;
+
             } else {
                 Swal.fire('ข้อผิดพลาด', res.message, 'error');
             }
         }
 
         function switchPage(pageId) {
-            // ซ่อนทุกหน้า
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
-            // แสดงหน้าเป้าหมาย
             document.getElementById('page-' + pageId).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(el => { el.classList.remove('bg-slate-700'); el.classList.add('hover:bg-slate-700'); });
             
-            // รีเซ็ตสีเมนูทั้งหมด
-            document.querySelectorAll('.nav-link').forEach(el => {
-                el.classList.remove('bg-slate-700'); el.classList.add('hover:bg-slate-700');
-            });
-
-            // ตรวจสอบว่ามีการคลิกจริงไหม (ป้องกัน Error ตอน Login)
             if (window.event && window.event.currentTarget && window.event.currentTarget.classList) {
-                window.event.currentTarget.classList.add('bg-slate-700');
-                window.event.currentTarget.classList.remove('hover:bg-slate-700');
+                window.event.currentTarget.classList.add('bg-slate-700'); window.event.currentTarget.classList.remove('hover:bg-slate-700');
                 document.getElementById('topbar-title').innerText = window.event.currentTarget.innerText.trim();
-            } else {
-                // ถ้าสลับหน้าอัตโนมัติ (เช่น ตอนเข้าระบบ)
-                let title = "บันทึกคะแนน";
-                if(pageId === 'personnel') title = "จัดการบุคลากร";
-                if(pageId === 'calculation') title = "คำนวณค่าตอบแทน";
-                document.getElementById('topbar-title').innerText = title;
             }
-
             if(window.innerWidth < 768) toggleSidebar();
         }
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-backdrop').classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-backdrop').classList.toggle('hidden');
         }
 
-        function logout() {
-            currentUser = null;
-            cachedUsers = [];
-            document.getElementById('login-page').classList.remove('hidden');
-            document.getElementById('main-app').classList.add('hidden');
-            document.getElementById('username').value = ''; document.getElementById('password').value = '';
-        }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
