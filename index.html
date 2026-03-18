@@ -59,7 +59,7 @@
                 <div id="page-scoring" class="page">
                     <div class="bg-white p-6 rounded-lg shadow-sm max-w-2xl mx-auto">
                         <div class="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                            <p class="text-sm text-yellow-700"><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> การกรอกซ้ำในเดือนเดิม ระบบจะถือเป็นการ "แก้ไข" ข้อมูลเดิม</p>
+                            <p class="text-sm text-yellow-700"><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> การกรอกซ้ำในเดือนเดิม ระบบจะถือเป็นการ "แก้ไขทับ" ข้อมูลเดิม</p>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -177,6 +177,7 @@
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
 
     <script>
+        // ใช้ URL ของคุณ
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         
         let currentUser = null; 
@@ -193,7 +194,7 @@
             } catch (error) {
                 Swal.close();
                 console.error(error);
-                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้ ตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต" };
+                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้" };
             }
         }
 
@@ -210,7 +211,9 @@
                 document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
                 document.getElementById('user-role-badge').innerText = currentUser.role || 'User';
                 
-                if(String(currentUser.role).toLowerCase() !== 'admin') {
+                let isAdmin = String(currentUser.role || '').trim().toLowerCase() === 'admin';
+                
+                if(!isAdmin) {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 } else {
                     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
@@ -219,6 +222,7 @@
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 
+                // แก้บั๊กแล้ว: เรียกฟังก์ชัน switchPage แบบไม่สน event
                 switchPage('scoring');
                 
                 // โหลดรายชื่อทันที
@@ -233,7 +237,9 @@
             const dropdown = document.getElementById('score-user');
             dropdown.innerHTML = '<option>กำลังโหลดรายชื่อ...</option>';
 
-            if (String(currentUser.role).toLowerCase() === 'admin') {
+            let isAdmin = String(currentUser.role || '').trim().toLowerCase() === 'admin';
+
+            if (isAdmin) {
                 let data = await apiCall('getUsers', {});
                 if(data.status === 'success' && data.data && data.data.length > 0) {
                     cachedUsers = data.data.filter(u => u.user_id && u.name); // กรองแถวว่างทิ้ง
@@ -247,7 +253,7 @@
                         <tr class="hover:bg-gray-50 border-b">
                             <td class="px-6 py-4 whitespace-nowrap">${u.name}</td>
                             <td class="px-6 py-4 whitespace-nowrap">${u.group_name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${String(u.role).toLowerCase() === 'admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${String(u.role).trim().toLowerCase() === 'admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${u.role || 'User'}</span></td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <button class="text-blue-600 hover:text-blue-900 mx-1 bg-blue-100 p-2 rounded-full" title="แก้ไข"><i class="fas fa-edit"></i></button>
                             </td>
@@ -257,11 +263,10 @@
                 } else {
                     cachedUsers = [];
                     dropdown.innerHTML = '<option value="">-- ไม่พบข้อมูลในฐานข้อมูล --</option>';
-                    document.getElementById('personnel-tbody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">API ส่งค่าว่างเปล่า โปรดตรวจสอบหัวคอลัมน์ใน Sheet</td></tr>`;
-                    Swal.fire('แจ้งเตือน', data.message || 'ดึงรายชื่อไม่สำเร็จ', 'warning');
+                    document.getElementById('personnel-tbody').innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่พบรายชื่อ โปรดตรวจสอบ Sheet</td></tr>`;
                 }
             } else {
-                // ถ้าเป็น User ธรรมดา
+                // ถ้าเป็น User ธรรมดา ล็อคให้เลือกได้แค่ตัวเอง
                 dropdown.innerHTML = `<option value="${currentUser.id}" selected>${currentUser.name} (${currentUser.group})</option>`;
                 dropdown.disabled = true;
                 dropdown.classList.add('bg-gray-100');
@@ -314,14 +319,29 @@
         }
 
         function switchPage(pageId) {
+            // ซ่อนทุกหน้า
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+            // แสดงหน้าเป้าหมาย
             document.getElementById('page-' + pageId).classList.remove('hidden');
+            
+            // รีเซ็ตสีเมนูทั้งหมด
             document.querySelectorAll('.nav-link').forEach(el => {
                 el.classList.remove('bg-slate-700'); el.classList.add('hover:bg-slate-700');
             });
-            event.currentTarget.classList.add('bg-slate-700');
-            event.currentTarget.classList.remove('hover:bg-slate-700');
-            document.getElementById('topbar-title').innerText = event.currentTarget.innerText;
+
+            // ตรวจสอบว่ามีการคลิกจริงไหม (ป้องกัน Error ตอน Login)
+            if (window.event && window.event.currentTarget && window.event.currentTarget.classList) {
+                window.event.currentTarget.classList.add('bg-slate-700');
+                window.event.currentTarget.classList.remove('hover:bg-slate-700');
+                document.getElementById('topbar-title').innerText = window.event.currentTarget.innerText.trim();
+            } else {
+                // ถ้าสลับหน้าอัตโนมัติ (เช่น ตอนเข้าระบบ)
+                let title = "บันทึกคะแนน";
+                if(pageId === 'personnel') title = "จัดการบุคลากร";
+                if(pageId === 'calculation') title = "คำนวณค่าตอบแทน";
+                document.getElementById('topbar-title').innerText = title;
+            }
+
             if(window.innerWidth < 768) toggleSidebar();
         }
 
