@@ -9,18 +9,29 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .ts-control { padding: 0.75rem 1rem; border-radius: 0.5rem; border-color: #e5e7eb; font-size: 0.875rem; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; }
+        .ts-control { padding: 0.75rem 1rem; border-radius: 0.5rem; border-color: #e2e8f0; font-size: 0.875rem; background-color: #f8fafc; }
+        
+        /* ธีม Luxurious Finance (White, Navy, Gold, Light Blue) */
+        .bg-navy-900 { background-color: #0f172a; }
+        .bg-navy-800 { background-color: #1e293b; }
+        .text-gold-500 { color: #d4af37; }
+        .bg-gold-500 { background-color: #d4af37; }
+        .border-gold-500 { border-color: #d4af37; }
         
         .glass-panel {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
+
+        .menu-fade { transition: all 0.3s ease-in-out; }
         
         @media print {
             aside, header, #sidebar-backdrop, .no-print { display: none !important; }
@@ -30,86 +41,154 @@
         }
     </style>
 </head>
-<body class="text-gray-800 flex h-screen overflow-hidden bg-gray-100">
+<body class="text-gray-800 flex h-screen overflow-hidden">
 
-    <div id="login-page" class="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 overflow-hidden">
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+    <div id="login-page" class="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-navy-900 via-blue-900 to-navy-800 overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-gold-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
         
-        <div class="glass-panel p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-lg z-10 relative mx-4">
-            <div class="text-center mb-10">
-                <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/20 mb-6 shadow-inner border border-white/30">
-                    <i class="fas fa-hospital text-5xl text-white"></i>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-md">ระบบบริหารจัดการ P4P</h2>
-                <h3 class="text-lg md:text-xl text-blue-200 font-medium tracking-wide">โรงพยาบาลจิตเวชเลยราชนครินทร์</h3>
+        <div class="glass-panel p-8 md:p-12 rounded-3xl w-full max-w-md z-10 relative mx-4 flex flex-col items-center">
+            <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" alt="Logo" class="h-24 md:h-28 mb-6 drop-shadow-md">
+            
+            <div class="text-center mb-8 w-full">
+                <h2 class="text-2xl md:text-3xl font-bold text-navy-900 mb-2">ระบบบริหารจัดการ P4P</h2>
+                <div class="h-1 w-16 bg-gold-500 mx-auto rounded-full mb-3"></div>
+                <h3 class="text-md text-blue-800 font-medium">โรงพยาบาลจิตเวชเลยราชนครินทร์</h3>
             </div>
             
-            <div class="space-y-6">
+            <div class="space-y-5 w-full">
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-user text-blue-300"></i></div>
-                    <input type="text" id="username" class="w-full pl-12 pr-4 py-4 bg-white/10 border border-blue-300/30 rounded-xl focus:ring-2 focus:ring-blue-400 focus:bg-white/20 text-white placeholder-blue-300 transition-all outline-none" placeholder="Username (รหัสผู้ใช้งาน)">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-user text-gray-400"></i></div>
+                    <input type="text" id="username" class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="รหัสผู้ใช้งาน">
                 </div>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-lock text-blue-300"></i></div>
-                    <input type="password" id="password" class="w-full pl-12 pr-4 py-4 bg-white/10 border border-blue-300/30 rounded-xl focus:ring-2 focus:ring-blue-400 focus:bg-white/20 text-white placeholder-blue-300 transition-all outline-none" placeholder="Password (รหัสผ่าน)">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-lock text-gray-400"></i></div>
+                    <input type="password" id="password" class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="รหัสผ่าน">
                 </div>
-                <button onclick="login()" id="btn-login" class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-bold py-4 px-4 rounded-xl shadow-lg transform transition-transform duration-200 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-500/50 mt-4 text-lg">
+                <button onclick="login()" class="w-full bg-gradient-to-r from-navy-800 to-blue-800 hover:from-navy-900 hover:to-blue-900 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transform transition-all duration-200 hover:-translate-y-0.5 focus:outline-none mt-4 text-lg border-b-4 border-navy-900">
                     เข้าสู่ระบบ
                 </button>
+            </div>
+            
+            <div class="mt-8 text-center text-xs text-gray-400 font-medium w-full">
+                <p>พัฒนาโดย: ภก.พิชญ์พงศ์ คงนาวัง</p>
+                <p>มีนาคม 2569</p>
             </div>
         </div>
     </div>
 
-    <aside id="sidebar" class="bg-slate-800 text-white w-64 flex-shrink-0 absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full transition-transform duration-300 flex flex-col hidden shadow-xl">
-        <div class="p-5 border-b border-slate-700 flex justify-between items-center bg-slate-900">
-            <span class="font-bold text-lg truncate"><i class="fas fa-hospital-user mr-2 text-blue-400"></i> P4P JVL</span>
+    <aside id="sidebar" class="bg-navy-900 text-gray-300 w-64 flex-shrink-0 absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full transition-transform duration-300 flex flex-col hidden shadow-xl border-r border-slate-800">
+        <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+            <div class="flex items-center">
+                <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" class="h-8 mr-2 bg-white rounded-full p-0.5">
+                <span class="font-bold text-lg text-white tracking-wide">P4P JVL</span>
+            </div>
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-2 text-sm">
-            <div class="pt-2 pb-1 text-xs text-gray-400 font-bold uppercase tracking-wider">ระบบบันทึกข้อมูล</div>
-            <a href="#" onclick="switchPage('scoring')" class="nav-link block px-4 py-2.5 rounded-lg bg-slate-700 transition-colors"><i class="fas fa-star w-6 text-yellow-400"></i> บันทึกคะแนน</a>
-            <a href="#" onclick="switchPage('score-summary')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-list-check w-6 text-green-400"></i> ตรวจสอบการบันทึก</a>
+        <div class="flex-1 overflow-y-auto p-4 space-y-1.5 text-sm menu-fade">
+            <a href="#" onclick="switchPage('dashboard')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-chart-pie w-6 text-blue-400"></i> ภาพรวม (Dashboard)</a>
             
-            <div class="admin-only pt-4 pb-1 text-xs text-gray-400 font-bold uppercase tracking-wider">ระบบจัดการหลัก</div>
-            <a href="#" onclick="switchPage('budget')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-coins w-6 text-yellow-500"></i> จัดการงบประมาณ</a>
-            <a href="#" onclick="switchPage('personnel')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-users-cog w-6 text-blue-400"></i> จัดการบุคลากร</a>
+            <div class="pt-4 pb-1 text-xs text-gray-500 font-bold uppercase tracking-wider pl-2">ปฏิบัติงาน</div>
+            <a href="#" onclick="switchPage('scoring')" class="nav-link block px-4 py-3 rounded-xl bg-blue-600/20 text-white border border-blue-500/30 transition-all"><i class="fas fa-edit w-6 text-gold-500"></i> บันทึกคะแนน</a>
+            <a href="#" onclick="switchPage('score-summary')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-list-check w-6 text-green-400"></i> ตรวจสอบการบันทึก</a>
             
-            <div class="admin-only pt-4 pb-1 text-xs text-gray-400 font-bold uppercase tracking-wider">ระบบประมวลผล</div>
-            <a href="#" onclick="switchPage('calculation')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-calculator w-6 text-purple-400"></i> ตารางคำนวณ (90/10)</a>
-            <a href="#" onclick="switchPage('report-ind')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-file-invoice-dollar w-6 text-gray-300"></i> รายงานรายบุคคล</a>
-            <a href="#" onclick="switchPage('report-group')" class="nav-link admin-only block px-4 py-2.5 rounded-lg hover:bg-slate-700 transition-colors"><i class="fas fa-file-alt w-6 text-gray-300"></i> รายงานสรุปกลุ่ม</a>
+            <div class="admin-only pt-4 pb-1 text-xs text-gray-500 font-bold uppercase tracking-wider pl-2">ตั้งค่าระบบ</div>
+            <a href="#" onclick="switchPage('budget')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-coins w-6 text-yellow-500"></i> จัดการงบประมาณ</a>
+            <a href="#" onclick="switchPage('personnel')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-users-cog w-6 text-blue-300"></i> ฐานข้อมูลบุคลากร</a>
+            
+            <div class="admin-only pt-4 pb-1 text-xs text-gray-500 font-bold uppercase tracking-wider pl-2">รายงานการเงิน</div>
+            <a href="#" onclick="switchPage('calculation')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-calculator w-6 text-purple-400"></i> ตารางคำนวณ (90/10)</a>
+            <a href="#" onclick="switchPage('report-ind')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-user-tag w-6 text-gray-300"></i> รายงานรายบุคคล</a>
+            <a href="#" onclick="switchPage('report-group')" class="nav-link admin-only block px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><i class="fas fa-layer-group w-6 text-gray-300"></i> รายงานสรุปกลุ่ม</a>
         </div>
-        <div class="p-4 border-t border-slate-700 bg-slate-900">
-            <button onclick="logout()" class="w-full flex items-center px-4 py-2.5 rounded-lg hover:bg-red-600/20 text-red-400 hover:text-red-300 transition-colors"><i class="fas fa-sign-out-alt w-6"></i> ออกจากระบบ</button>
+        <div class="p-4 border-t border-slate-800 bg-slate-900">
+            <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all border border-red-500/20"><i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบ</button>
         </div>
     </aside>
 
-    <div id="main-content" class="flex-1 flex flex-col relative hidden">
-        <header class="bg-white shadow-sm border-b p-4 flex justify-between items-center z-10">
+    <div id="main-content" class="flex-1 flex flex-col relative hidden bg-gray-50">
+        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 sticky top-0">
             <div class="flex items-center">
-                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 mr-4 focus:outline-none"><i class="fas fa-bars text-xl"></i></button>
-                <div class="font-bold text-gray-800 text-lg md:text-xl" id="topbar-title">บันทึกคะแนน</div>
+                <button onclick="toggleSidebar()" class="md:hidden text-navy-900 mr-4 focus:outline-none hover:text-blue-600 transition-colors"><i class="fas fa-bars text-2xl"></i></button>
+                <div class="font-bold text-navy-900 text-lg md:text-xl border-l-4 border-gold-500 pl-3" id="topbar-title">บันทึกคะแนน</div>
             </div>
-            <div class="flex items-center space-x-3">
-                <span class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-bold shadow-sm" id="user-role-badge">Role</span>
-                <div class="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md" id="user-avatar">U</div>
-                <span class="font-medium text-gray-700 hidden sm:block" id="display-name">User</span>
+            <div class="flex items-center space-x-3 bg-gray-50 py-1.5 px-3 rounded-full border border-gray-200">
+                <span class="text-xs bg-gold-500/20 text-yellow-700 px-2.5 py-1 rounded-full font-bold uppercase tracking-wide" id="user-role-badge">Role</span>
+                <span class="font-semibold text-navy-900 hidden sm:block text-sm" id="display-name">User</span>
+                <div class="w-8 h-8 rounded-full bg-navy-800 text-gold-500 flex items-center justify-center font-bold text-sm border border-gold-500/50 shadow-inner" id="user-avatar">U</div>
             </div>
         </header>
 
         <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8">
             
+            <div id="page-dashboard" class="page hidden admin-only max-w-6xl mx-auto space-y-6">
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-4">
+                    <span class="font-bold text-navy-900"><i class="fas fa-filter mr-2"></i>เดือนที่แสดงผล:</span>
+                    <select id="dash-month" class="border-gray-300 rounded-lg p-2 text-sm shadow-sm w-32"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
+                    <input type="number" id="dash-year" class="border-gray-300 rounded-lg p-2 text-sm w-24 shadow-sm" value="2567">
+                    <button onclick="loadDashboard()" class="bg-navy-800 text-white px-5 py-2 rounded-lg hover:bg-navy-900 shadow transition-colors"><i class="fas fa-sync-alt mr-2"></i> อัปเดตข้อมูล</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-blue-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wide mb-1">งบประมาณรวม</p>
+                            <h3 class="text-2xl font-bold text-navy-900" id="dash-budget">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><i class="fas fa-money-bill-wave text-xl"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-purple-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wide mb-1">สถานะคีย์ข้อมูล</p>
+                            <h3 class="text-2xl font-bold text-navy-900"><span id="dash-entered">0</span><span class="text-sm text-gray-400">/<span id="dash-total">0</span> คน</span></h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center font-bold text-purple-600 text-lg border border-purple-100" id="dash-percent">0%</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-green-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wide mb-1">ได้รับ P4P</p>
+                            <h3 class="text-2xl font-bold text-green-600" id="dash-received">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500"><i class="fas fa-user-check text-xl"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-red-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wide mb-1">ไม่ได้รับ P4P</p>
+                            <h3 class="text-2xl font-bold text-red-500" id="dash-not-received">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-user-times text-xl"></i></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-navy-900 mb-4"><i class="fas fa-chart-bar text-gray-400 mr-2"></i> สัดส่วนการได้รับ P4P</h3>
+                        <div class="h-64 w-full relative"><canvas id="p4pChart"></canvas></div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="text-sm font-bold text-green-600 mb-3 uppercase tracking-wide"><i class="fas fa-user-plus mr-2"></i> บุคลากรเข้าใหม่เดือนนี้</h3>
+                            <ul id="dash-new-hires" class="space-y-2 text-sm text-gray-600"><li>รอโหลดข้อมูล...</li></ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="text-sm font-bold text-red-500 mb-3 uppercase tracking-wide"><i class="fas fa-user-minus mr-2"></i> บุคลากรลาออกเดือนนี้</h3>
+                            <ul id="dash-resigned" class="space-y-2 text-sm text-gray-600"><li>รอโหลดข้อมูล...</li></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="page-scoring" class="page max-w-3xl mx-auto">
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                        <p class="text-sm text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>คำแนะนำ:</strong> รายชื่อบุคลากรที่บันทึกคะแนนไปแล้ว หรืออยู่นอกระยะเวลาทำงาน จะถูกซ่อนอัตโนมัติ</p>
+                    <div class="mb-6 bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start">
+                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-3 text-lg"></i>
+                        <p class="text-sm text-blue-900">รายชื่อบุคลากรที่บันทึกคะแนนไปแล้ว หรืออยู่นอกระยะเวลาทำงาน จะถูกซ่อนอัตโนมัติ หากต้องการแก้ไขข้อมูลที่กรอกไปแล้วให้ไปที่เมนู <strong>ตรวจสอบการบันทึก</strong></p>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">เดือนที่ประเมิน</label>
-                            <select id="score-month" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" onchange="refreshScoreDropdown()">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">เดือนที่ประเมิน</label>
+                            <select id="score-month" class="w-full border-gray-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3 border bg-gray-50" onchange="refreshScoreDropdown()">
                                 <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
                                 <option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option>
                                 <option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option>
@@ -117,39 +196,39 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">ปี (พ.ศ.)</label>
-                            <input type="number" id="score-year" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" value="2567" onchange="refreshScoreDropdown()">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">ปี (พ.ศ.)</label>
+                            <input type="number" id="score-year" class="w-full border-gray-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3 border bg-gray-50" value="2567" onchange="refreshScoreDropdown()">
                         </div>
                     </div>
                     
-                    <div id="group-filter-container" class="mb-6 hidden">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fas fa-filter text-gray-400 mr-1"></i> กรองรายชื่อตามกลุ่ม</label>
-                        <select id="score-group-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" onchange="filterUsersByGroup()">
+                    <div id="group-filter-container" class="mb-6 hidden bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <label class="block text-sm font-bold text-navy-900 mb-2"><i class="fas fa-filter text-gold-500 mr-2"></i> กรองรายชื่อตามกลุ่มงาน</label>
+                        <select id="score-group-filter" class="w-full border-gray-300 rounded-lg p-2.5 border outline-none" onchange="filterUsersByGroup()">
                             <option value="ALL">-- แสดงทุกกลุ่ม --</option>
                         </select>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">ค้นหาบุคลากร</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">ค้นหาบุคลากร</label>
                         <select id="score-user" class="w-full" placeholder="พิมพ์ชื่อเพื่อค้นหา..."></select>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">สถานะการรับ P4P</label>
-                        <select id="score-status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" onchange="toggleScoreForm()">
-                            <option value="ได้รับ P4P">ได้รับ P4P</option>
-                            <option value="ไม่ได้รับ P4P">ไม่ได้รับ P4P</option>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">สถานะการรับ P4P</label>
+                        <select id="score-status" class="w-full border-gray-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3 border font-medium" onchange="toggleScoreForm()">
+                            <option value="ได้รับ P4P" class="text-green-600">✅ ได้รับ P4P</option>
+                            <option value="ไม่ได้รับ P4P" class="text-red-600">❌ ไม่ได้รับ P4P</option>
                         </select>
                     </div>
 
-                    <div id="form-raw-score" class="mb-8">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">คะแนนดิบรวม</label>
-                        <input type="number" id="raw-score-input" class="w-full border-blue-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3 border bg-blue-50 text-lg font-bold text-blue-800" placeholder="กรอกคะแนน (ตัวเลข)">
+                    <div id="form-raw-score" class="mb-8 p-5 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <label class="block text-sm font-bold text-blue-900 mb-2">คะแนนดิบรวม</label>
+                        <input type="number" id="raw-score-input" class="w-full border-blue-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3.5 border bg-white text-xl font-bold text-blue-800" placeholder="ระบุตัวเลขคะแนน">
                     </div>
 
-                    <div id="form-reason" class="mb-8 hidden">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">เหตุผลที่ไม่ได้</label>
-                        <select id="reason-input" class="w-full border-red-300 rounded-lg shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 p-2.5 border bg-red-50">
+                    <div id="form-reason" class="mb-8 hidden p-5 bg-red-50/50 rounded-xl border border-red-100">
+                        <label class="block text-sm font-bold text-red-900 mb-2">เหตุผลที่ไม่ได้</label>
+                        <select id="reason-input" class="w-full border-red-300 rounded-xl shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 p-3.5 border bg-white text-gray-800 font-medium">
                             <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน</option>
                             <option value="ไม่ส่งคะแนน">ไม่ส่งคะแนน</option>
                             <option value="เรียน PG">เรียน PG</option>
@@ -161,67 +240,67 @@
                         </select>
                     </div>
 
-                    <button onclick="submitScore()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-md transition-colors text-lg flex justify-center items-center">
-                        <i class="fas fa-save mr-2"></i> บันทึกข้อมูลคะแนน
+                    <button onclick="submitScore()" class="w-full bg-navy-900 text-gold-500 border border-gold-500/30 font-bold py-4 rounded-xl hover:bg-navy-800 hover:text-white shadow-lg transition-all text-lg flex justify-center items-center group">
+                        <i class="fas fa-save mr-2 group-hover:scale-110 transition-transform"></i> บันทึกข้อมูล
                     </button>
                 </div>
             </div>
 
-            <div id="page-score-summary" class="page hidden max-w-5xl mx-auto">
+            <div id="page-score-summary" class="page hidden max-w-6xl mx-auto">
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-gray-800"><i class="fas fa-list-check text-green-500 mr-2"></i> ตรวจสอบผู้ที่บันทึกคะแนนแล้ว</h2>
-                    <div class="flex flex-col sm:flex-row gap-4 mb-6 bg-gray-50 p-4 rounded-lg border">
+                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-navy-900"><i class="fas fa-list-check text-blue-500 mr-2"></i> ตรวจสอบผู้ที่บันทึกคะแนนแล้ว</h2>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
                         <div class="flex-1 flex items-center">
-                            <label class="mr-3 font-semibold text-gray-700">เดือน:</label>
-                            <select id="summary-month" class="border rounded-md p-2 flex-1"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
+                            <label class="mr-3 font-bold text-gray-700">เดือน:</label>
+                            <select id="summary-month" class="border-gray-300 rounded-lg p-2 flex-1 outline-none"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
                         </div>
                         <div class="flex-1 flex items-center">
-                            <label class="mr-3 font-semibold text-gray-700">ปี (พ.ศ.):</label>
-                            <input type="number" id="summary-year" class="border rounded-md p-2 flex-1" value="2567">
+                            <label class="mr-3 font-bold text-gray-700">ปี พ.ศ.:</label>
+                            <input type="number" id="summary-year" class="border-gray-300 rounded-lg p-2 flex-1 outline-none" value="2567">
                         </div>
-                        <button onclick="loadScoreSummary()" class="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-900 shadow transition-colors"><i class="fas fa-search mr-2"></i> ดึงข้อมูล</button>
+                        <button onclick="loadScoreSummary()" class="bg-navy-800 text-white px-6 py-2 rounded-lg hover:bg-navy-900 shadow transition-colors font-medium"><i class="fas fa-search mr-2"></i> ดึงข้อมูล</button>
                     </div>
                     
-                    <div class="overflow-x-auto rounded-lg border">
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-inner">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-100 border-b">
                                 <tr>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">ชื่อ-สกุล</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">กลุ่มงาน</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">สถานะ</th>
-                                    <th class="px-4 py-3 text-right font-semibold text-gray-600">คะแนนดิบ</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">เหตุผล</th>
-                                    <th class="px-4 py-3 text-center font-semibold text-gray-600">จัดการ</th>
+                                    <th class="px-5 py-4 text-left font-bold text-gray-700">ชื่อ-สกุล</th>
+                                    <th class="px-5 py-4 text-left font-bold text-gray-700">กลุ่มงาน</th>
+                                    <th class="px-5 py-4 text-center font-bold text-gray-700">สถานะ</th>
+                                    <th class="px-5 py-4 text-right font-bold text-gray-700">คะแนนดิบ</th>
+                                    <th class="px-5 py-4 text-left font-bold text-gray-700">เหตุผล</th>
+                                    <th class="px-5 py-4 text-center font-bold text-gray-700">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="score-summary-tbody" class="divide-y divide-gray-200 bg-white">
-                                <tr><td colspan="6" class="text-center py-8 text-gray-400">ระบุเดือนและปี แล้วกดปุ่ม "ดึงข้อมูล"</td></tr>
+                                <tr><td colspan="6" class="text-center py-10 text-gray-400">ระบุเดือนและปี แล้วกดปุ่ม "ดึงข้อมูล"</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div id="page-budget" class="page hidden max-w-4xl mx-auto space-y-6">
+            <div id="page-budget" class="page hidden max-w-5xl mx-auto space-y-6">
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-gray-800"><i class="fas fa-coins text-yellow-500 mr-2"></i> ตั้งค่าและแก้ไข งบประมาณรวม</h2>
+                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-navy-900"><i class="fas fa-coins text-gold-500 mr-2"></i> กำหนดงบประมาณรวมประจำเดือน</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">เดือน</label>
-                            <select id="budget-month" class="w-full border-gray-300 rounded-lg p-2.5 border"><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option><option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option><option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option></select>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">เดือน</label>
+                            <select id="budget-month" class="w-full border-gray-300 rounded-xl p-3 border bg-gray-50"><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option><option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option><option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option></select>
                         </div>
-                        <div><label class="block text-sm font-semibold text-gray-700 mb-2">ปี (พ.ศ.)</label><input type="number" id="budget-year" class="w-full border-gray-300 rounded-lg p-2.5 border" value="2567"></div>
+                        <div><label class="block text-sm font-bold text-gray-700 mb-2">ปี (พ.ศ.)</label><input type="number" id="budget-year" class="w-full border-gray-300 rounded-xl p-3 border bg-gray-50" value="2567"></div>
                     </div>
-                    <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">จำนวนเงินงบประมาณ (บาท)</label><input type="number" id="budget-amount" class="w-full border-green-300 rounded-lg p-3 border bg-green-50 text-green-800 font-bold text-lg" placeholder="ระบุตัวเลข"></div>
-                    <button onclick="submitBudget()" class="bg-green-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-green-700 shadow-md transition-colors"><i class="fas fa-save mr-2"></i> บันทึกงบประมาณ</button>
+                    <div class="mb-8"><label class="block text-sm font-bold text-gray-700 mb-2">จำนวนเงินงบประมาณ (บาท)</label><input type="number" id="budget-amount" class="w-full border-gold-500/50 rounded-xl p-4 border bg-yellow-50 text-yellow-900 font-bold text-2xl shadow-inner" placeholder="ระบุตัวเลข"></div>
+                    <button onclick="submitBudget()" class="bg-navy-900 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-navy-800 shadow-lg transition-all w-full md:w-auto md:min-w-[200px] flex items-center justify-center mx-auto border border-gold-500/30"><i class="fas fa-save mr-2 text-gold-500"></i> บันทึกงบประมาณ</button>
                 </div>
 
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-4 pb-2 border-b text-gray-800"><i class="fas fa-history text-gray-500 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
-                    <div class="overflow-x-auto rounded-lg border">
+                    <h2 class="text-lg font-bold mb-4 pb-2 border-b text-gray-700"><i class="fas fa-history text-gray-400 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50 border-b">
-                                <tr><th class="px-4 py-3 text-left font-semibold text-gray-600">เดือน / ปี (พ.ศ.)</th><th class="px-4 py-3 text-right font-semibold text-gray-600">จำนวนเงิน (บาท)</th><th class="px-4 py-3 text-center font-semibold text-gray-600">จัดการ</th></tr>
+                                <tr><th class="px-5 py-4 text-left font-bold text-gray-600">เดือน / ปี (พ.ศ.)</th><th class="px-5 py-4 text-right font-bold text-gray-600">จำนวนเงิน (บาท)</th><th class="px-5 py-4 text-center font-bold text-gray-600 w-32">จัดการ</th></tr>
                             </thead>
                             <tbody id="budget-tbody" class="divide-y divide-gray-200 bg-white"></tbody>
                         </table>
@@ -232,13 +311,13 @@
             <div id="page-personnel" class="page hidden">
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-users-cog text-blue-500 mr-2"></i> ฐานข้อมูลบุคลากร</h2>
-                        <button onclick="openUserModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition-colors font-medium"><i class="fas fa-user-plus mr-2"></i> เพิ่มบุคลากร</button>
+                        <h2 class="text-xl font-bold text-navy-900"><i class="fas fa-users-cog text-blue-500 mr-2"></i> ฐานข้อมูลบุคลากร</h2>
+                        <button onclick="openUserModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition-colors font-medium flex items-center"><i class="fas fa-user-plus mr-2 text-gold-500"></i> เพิ่มบุคลากร</button>
                     </div>
-                    <div class="overflow-x-auto rounded-lg border">
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
                         <table class="min-w-full text-sm">
-                            <thead class="bg-gray-50 border-b">
-                                <tr><th class="px-4 py-3 text-left font-semibold text-gray-600">ID / Username</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ชื่อ-สกุล</th><th class="px-4 py-3 text-left font-semibold text-gray-600">กลุ่มงาน</th><th class="px-4 py-3 text-center font-semibold text-gray-600">สถานะ</th><th class="px-4 py-3 text-left font-semibold text-gray-600">เริ่มงาน</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ออกงาน</th><th class="px-4 py-3 text-center font-semibold text-gray-600">จัดการ</th></tr>
+                            <thead class="bg-gray-100 border-b">
+                                <tr><th class="px-5 py-4 text-left font-bold text-gray-700">รหัส / ยูสเซอร์</th><th class="px-5 py-4 text-left font-bold text-gray-700">ชื่อ-สกุล</th><th class="px-5 py-4 text-left font-bold text-gray-700">กลุ่มงาน</th><th class="px-5 py-4 text-center font-bold text-gray-700">สถานะ</th><th class="px-5 py-4 text-left font-bold text-gray-700">รอบปฏิบัติงาน</th><th class="px-5 py-4 text-center font-bold text-gray-700 w-32">จัดการ</th></tr>
                             </thead>
                             <tbody id="personnel-tbody" class="divide-y divide-gray-200 bg-white"></tbody>
                         </table>
@@ -247,74 +326,78 @@
             </div>
 
             <div id="user-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-full overflow-hidden transform transition-all">
-                    <div class="p-5 border-b flex justify-between items-center bg-gray-50">
-                        <h3 class="text-lg font-bold text-gray-800" id="user-modal-title">ข้อมูลบุคลากร</h3>
-                        <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times text-xl"></i></button>
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transform transition-all">
+                    <div class="p-5 border-b flex justify-between items-center bg-navy-900 text-white">
+                        <h3 class="text-lg font-bold" id="user-modal-title">ข้อมูลบุคลากร</h3>
+                        <button onclick="closeUserModal()" class="text-gray-400 hover:text-white transition-colors focus:outline-none"><i class="fas fa-times text-xl"></i></button>
                     </div>
-                    <div class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-5 bg-gray-50">
                         <input type="hidden" id="modal-mode">
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">รหัสพนักงาน (ID)</label><input type="text" id="m-id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Username</label><input type="text" id="m-user" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Password</label><input type="text" id="m-pass" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">ชื่อ-สกุล</label><input type="text" id="m-name" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">กลุ่มงาน</label><input type="text" id="m-group" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">แต้มประกัน</label><input type="number" id="m-guarantee" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="600"></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">สิทธิ์ (Role)</label><select id="m-role" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="User">User</option><option value="Admin">Admin</option></select></div>
-                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">สถานะการใช้งาน</label><select id="m-status" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="Active">Active (ใช้งาน)</option><option value="Inactive">Inactive (ระงับการใช้งาน)</option></select></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">รหัสพนักงาน (ID)</label><input type="text" id="m-id" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 focus:border-blue-500 outline-none"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Username</label><input type="text" id="m-user" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 focus:border-blue-500 outline-none"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Password</label><input type="text" id="m-pass" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 focus:border-blue-500 outline-none"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ชื่อ-สกุล (ไม่ต้องระบุคำนำหน้า)</label><input type="text" id="m-name" class="w-full border-0 border-b border-gray-300 p-1 text-sm font-bold text-blue-900 focus:ring-0 focus:border-blue-500 outline-none"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">กลุ่มงาน</label><input type="text" id="m-group" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 focus:border-blue-500 outline-none"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">แต้มประกัน (ส่วนใหญ่ 600)</label><input type="number" id="m-guarantee" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 focus:border-blue-500 outline-none text-right font-bold text-indigo-600" value="600"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">สิทธิ์ (Role)</label><select id="m-role" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 outline-none"><option value="User">User</option><option value="Admin">Admin</option></select></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">สถานะระบบ</label><select id="m-status" class="w-full border-0 border-b border-gray-300 p-1 text-sm focus:ring-0 outline-none font-bold"><option value="Active" class="text-green-600">Active (ใช้งาน)</option><option value="Inactive" class="text-red-600">Inactive (ระงับชั่วคราว)</option></select></div>
                         
-                        <div class="sm:col-span-2 border-t mt-2 pt-4">
-                            <p class="text-sm font-bold text-indigo-700 mb-4"><i class="fas fa-calendar-alt mr-2"></i> กำหนดระยะเวลาการทำงาน (ตัดอัตรากำลังอัตโนมัติ)</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-gray-50 p-3 rounded-lg border">
-                                    <p class="text-xs font-bold text-gray-500 mb-2">เริ่มงาน</p>
-                                    <div class="flex gap-2"><input type="number" id="m-s-m" class="w-full border border-gray-300 rounded p-1.5 text-sm" placeholder="เดือน"><input type="number" id="m-s-y" class="w-full border border-gray-300 rounded p-1.5 text-sm" placeholder="ปี 2567"></div>
-                                </div>
-                                <div class="bg-gray-50 p-3 rounded-lg border">
-                                    <p class="text-xs font-bold text-gray-500 mb-2 text-red-500">ออกงาน (ถ้ามี)</p>
-                                    <div class="flex gap-2"><input type="number" id="m-e-m" class="w-full border border-gray-300 rounded p-1.5 text-sm" placeholder="เดือน"><input type="number" id="m-e-y" class="w-full border border-gray-300 rounded p-1.5 text-sm" placeholder="ปี"></div>
+                        <div class="sm:col-span-2 mt-2">
+                            <div class="bg-white border rounded-xl p-4 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                <p class="text-sm font-bold text-navy-900 mb-3"><i class="fas fa-calendar-check mr-2 text-blue-500"></i> รอบการปฏิบัติงาน (มีผลกับการคำนวณเงินก้อนกลุ่ม)</p>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-400 mb-1.5">เริ่มงาน</p>
+                                        <div class="flex gap-2"><input type="number" id="m-s-m" class="w-full border rounded p-1.5 text-sm bg-gray-50 text-center" placeholder="เดือน"><span class="pt-1">/</span><input type="number" id="m-s-y" class="w-full border rounded p-1.5 text-sm bg-gray-50 text-center" placeholder="ปี 2567"></div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-red-400 mb-1.5">สิ้นสุดการทำงาน (ลาออก/โอนย้าย)</p>
+                                        <div class="flex gap-2"><input type="number" id="m-e-m" class="w-full border border-red-200 rounded p-1.5 text-sm bg-red-50 text-center" placeholder="เดือน"><span class="pt-1">/</span><input type="number" id="m-e-y" class="w-full border border-red-200 rounded p-1.5 text-sm bg-red-50 text-center" placeholder="ปี พ.ศ."></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="p-5 border-t bg-gray-50 flex justify-end gap-3">
-                        <button onclick="closeUserModal()" class="px-5 py-2 border border-gray-300 bg-white rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors">ยกเลิก</button>
-                        <button onclick="submitUser()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow font-medium transition-colors">บันทึกข้อมูล</button>
+                    <div class="p-5 border-t bg-white flex justify-end gap-3">
+                        <button onclick="closeUserModal()" class="px-6 py-2.5 rounded-lg text-gray-500 hover:bg-gray-100 font-bold transition-colors">ยกเลิก</button>
+                        <button onclick="submitUser()" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md font-bold transition-colors"><i class="fas fa-save mr-2"></i> บันทึกข้อมูล</button>
                     </div>
                 </div>
             </div>
 
-            <div id="calc-controls" class="admin-only hidden bg-indigo-50 border border-indigo-100 p-4 rounded-xl shadow-sm mb-6 no-print">
+            <div id="calc-controls" class="admin-only hidden bg-white border border-gray-200 p-5 rounded-2xl shadow-sm mb-6 no-print">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex items-center flex-wrap gap-3">
-                        <span class="font-bold text-indigo-900"><i class="fas fa-cogs mr-1"></i> เลือกรอบประมวลผล:</span>
-                        <select id="calc-month" class="border-gray-300 rounded-md p-2 text-sm shadow-sm"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
-                        <input type="number" id="calc-year" class="border-gray-300 rounded-md p-2 text-sm w-24 shadow-sm" value="2567">
-                        <button onclick="runCalculation()" class="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 shadow-md transition-colors font-medium"><i class="fas fa-play mr-2"></i> ประมวลผลเงิน</button>
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-2"><i class="fas fa-cogs"></i></div>
+                        <span class="font-bold text-navy-900 mr-1">เลือกรอบบิล:</span>
+                        <select id="calc-month" class="border-gray-300 rounded-lg p-2.5 text-sm shadow-sm bg-gray-50"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
+                        <input type="number" id="calc-year" class="border-gray-300 rounded-lg p-2.5 text-sm w-24 shadow-sm bg-gray-50" value="2567">
+                        <button onclick="runCalculation()" class="bg-navy-900 text-white px-6 py-2.5 rounded-lg hover:bg-navy-800 shadow-lg transition-colors font-bold border border-gold-500/30 ml-2"><i class="fas fa-bolt mr-2 text-gold-500"></i> ประมวลผล P4P</button>
                     </div>
-                    <button onclick="window.print()" class="bg-gray-800 text-white px-5 py-2 rounded-md hover:bg-gray-900 shadow-md transition-colors font-medium"><i class="fas fa-print mr-2"></i> พิมพ์ / Save PDF</button>
+                    <button onclick="window.print()" class="bg-gray-100 text-gray-800 border border-gray-300 px-6 py-2.5 rounded-lg hover:bg-gray-200 shadow-sm transition-colors font-bold"><i class="fas fa-print mr-2"></i> Print / PDF</button>
                 </div>
             </div>
 
             <div id="page-calculation" class="page hidden print-container">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h2 class="text-xl font-bold mb-6 text-indigo-800 print:text-center"><i class="fas fa-search-dollar mr-2"></i> ตารางตรวจสอบการปัดเศษ (90/10)</h2>
-                    <div class="overflow-x-auto border rounded-lg">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+                    <h2 class="text-xl font-bold mb-6 text-navy-900 print:text-center border-b pb-3"><i class="fas fa-search-dollar mr-2 text-purple-500"></i> ตารางตรวจสอบการปัดเศษ และกระจายเงินก้อนกลุ่ม (90/10)</h2>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
                         <table class="min-w-full text-xs md:text-sm whitespace-nowrap">
-                            <thead class="bg-yellow-100 border-b border-yellow-200">
+                            <thead class="bg-slate-50 border-b">
                                 <tr>
-                                    <th class="px-3 py-3 text-left border-r font-bold text-gray-700">กลุ่มงาน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">สัดส่วน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">ยอดคน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-blue-800 bg-blue-50">เงินก้อนกลุ่ม</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">90%</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">10%</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-green-800 bg-green-50">รวมจ่ายจริง</th>
-                                    <th class="px-3 py-3 text-right font-bold text-gray-700">Check (=0)</th>
+                                    <th class="px-4 py-3 text-left border-r font-bold text-gray-700">กลุ่มงาน</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-gray-700">น้ำหนัก</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-gray-700">ยอดคน (Active)</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-blue-900 bg-blue-50/50">เงินก้อนกลุ่ม</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-gray-700">90%</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-gray-700">10%</th>
+                                    <th class="px-4 py-3 text-right border-r font-bold text-green-900 bg-green-50/50">รวมจ่ายจริง</th>
+                                    <th class="px-4 py-3 text-right font-bold text-gray-700">Check (=0)</th>
                                 </tr>
                             </thead>
                             <tbody id="summary-tbody" class="divide-y divide-gray-200">
-                                <tr><td colspan="8" class="text-center py-10 text-gray-400">ระบุเดือน/ปี ด้านบน แล้วกดปุ่มประมวลผล</td></tr>
+                                <tr><td colspan="8" class="text-center py-12 text-gray-400 italic">ระบุเดือน/ปี ด้านบน แล้วกดปุ่ม "ประมวลผล P4P"</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -322,68 +405,75 @@
             </div>
 
             <div id="page-report-ind" class="page hidden print-container">
-                <div class="bg-white p-8 rounded-xl border border-gray-200">
-                    <div class="text-center mb-8">
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-center mb-8 pb-4 border-b">
                         <h2 class="text-xl font-bold text-gray-900 mb-2">สรุปค่าตอบแทนตามผลการปฏิบัติงาน (P4P) รพ.จิตเวชเลยราชนครินทร์</h2>
-                        <h3 class="text-lg text-gray-700" id="ind-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
+                        <h3 class="text-lg text-gray-600 font-medium" id="ind-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
                     </div>
                     <table class="min-w-full text-sm border-2 border-gray-900">
                         <thead class="border-b-2 border-gray-900 bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-center border-r-2 border-gray-900 w-20 font-bold">ลำดับ</th>
-                                <th class="px-4 py-3 text-left border-r-2 border-gray-900 font-bold">ชื่อ - สกุล</th>
-                                <th class="px-4 py-3 text-left border-r-2 border-gray-900 font-bold">กลุ่มงาน</th>
-                                <th class="px-4 py-3 text-right font-bold w-48">ค่าตอบแทน (บาท)</th>
+                                <th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th>
+                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">ชื่อ - สกุล</th>
+                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่มงาน</th>
+                                <th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทน (บาท)</th>
                             </tr>
                         </thead>
-                        <tbody id="report-ind-tbody" class="divide-y border-b-2 border-gray-900">
-                            <tr><td colspan="4" class="text-center py-6">กรุณากดประมวลผล</td></tr>
+                        <tbody id="report-ind-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800">
+                            <tr><td colspan="4" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr>
                         </tbody>
                     </table>
+                    <div class="mt-12 text-right text-sm">
+                        <p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p>
+                        <p class="mb-2">(..............................................................)</p>
+                        <p>ตำแหน่ง..............................................................</p>
+                    </div>
                 </div>
             </div>
 
             <div id="page-report-group" class="page hidden print-container">
-                <div class="bg-white p-8 rounded-xl border border-gray-200 max-w-3xl mx-auto">
-                    <div class="text-center mb-8">
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm max-w-3xl mx-auto">
+                    <div class="text-center mb-8 pb-4 border-b">
                         <h2 class="text-xl font-bold text-gray-900 mb-2">สรุปค่าตอบแทนตามผลการปฏิบัติงาน (P4P) รพ.จิตเวชเลยราชนครินทร์</h2>
-                        <h3 class="text-lg text-gray-700" id="group-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
+                        <h3 class="text-lg text-gray-600 font-medium" id="group-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
                     </div>
                     <table class="min-w-full text-sm border-2 border-gray-900">
                         <thead class="border-b-2 border-gray-900 bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-center border-r-2 border-gray-900 w-20 font-bold">ลำดับ</th>
-                                <th class="px-4 py-3 text-left border-r-2 border-gray-900 font-bold">กลุ่มงาน</th>
-                                <th class="px-4 py-3 text-right font-bold w-48">ค่าตอบแทนรวม (บาท)</th>
+                                <th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th>
+                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่มงาน</th>
+                                <th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทนรวม (บาท)</th>
                             </tr>
                         </thead>
-                        <tbody id="report-group-tbody" class="divide-y border-b-2 border-gray-900">
-                            <tr><td colspan="3" class="text-center py-6">กรุณากดประมวลผล</td></tr>
+                        <tbody id="report-group-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800">
+                            <tr><td colspan="3" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr>
                         </tbody>
-                        <tfoot class="bg-gray-100 font-bold text-base">
+                        <tfoot class="bg-gray-100 text-base">
                             <tr>
-                                <td colspan="2" class="px-4 py-3 text-center border-r-2 border-gray-900 text-gray-900">รวมทั้งหมด</td>
-                                <td class="px-4 py-3 text-right text-green-700" id="group-report-total">0.00</td>
+                                <td colspan="2" class="px-5 py-4 text-center border-r-2 border-gray-900 font-bold text-gray-900">รวมทั้งหมด</td>
+                                <td class="px-5 py-4 text-right font-bold text-green-700 text-lg border-t-2 border-gray-900 border-double" id="group-report-total">0.00</td>
                             </tr>
                         </tfoot>
                     </table>
+                    <div class="mt-12 text-right text-sm">
+                        <p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p>
+                        <p class="mb-2">(..............................................................)</p>
+                        <p>ตำแหน่ง..............................................................</p>
+                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 hidden md:hidden"></div>
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-navy-900/60 backdrop-blur-sm z-30 hidden md:hidden"></div>
 
     <script>
         // === Configuration ===
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         
-        let currentUser = null; 
-        let cachedUsers = []; 
-        let currentScoredUsers = [];
-        let currentlyEditingUserId = null;
-        let tomSelectInstance = null;
+        let currentUser = null, cachedUsers = [], currentScoredUsers = [];
+        let currentlyEditingUserId = null, tomSelectInstance = null, dashboardChart = null;
         
         const mNames = {"10":"ตุลาคม","11":"พฤศจิกายน","12":"ธันวาคม","01":"มกราคม","02":"กุมภาพันธ์","03":"มีนาคม","04":"เมษายน","05":"พฤษภาคม","06":"มิถุนายน","07":"กรกฎาคม","08":"สิงหาคม","09":"กันยายน"};
 
@@ -393,12 +483,9 @@
             Swal.showLoading();
             try {
                 const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
-                Swal.close(); 
-                return await res.json();
+                Swal.close(); return await res.json();
             } catch (error) {
-                Swal.close(); 
-                console.error("API Error:", error);
-                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้" };
+                Swal.close(); console.error(error); return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้" };
             }
         }
 
@@ -420,94 +507,96 @@
                 document.getElementById('main-content').classList.remove('hidden');
                 document.getElementById('sidebar').classList.remove('hidden');
                 
-                switchPage('scoring');
+                if(isAdmin) { switchPage('dashboard'); } else { switchPage('scoring'); }
                 await loadUsers();
-            } else {
-                Swal.fire('ผิดพลาด', data.message, 'error');
-            }
+            } else Swal.fire('ผิดพลาด', data.message, 'error');
         }
 
+        // === Dashboard ===
+        async function loadDashboard() {
+            let m = document.getElementById('dash-month').value, y = document.getElementById('dash-year').value;
+            let res = await apiCall('getDashboard', { month: m, year: y });
+            if(res.status === 'success') {
+                let d = res.data;
+                document.getElementById('dash-budget').innerText = d.budget.toLocaleString();
+                document.getElementById('dash-entered').innerText = d.enteredCount;
+                document.getElementById('dash-total').innerText = d.totalActive;
+                document.getElementById('dash-percent').innerText = d.percentComplete + '%';
+                document.getElementById('dash-received').innerText = d.receivedP4P;
+                document.getElementById('dash-not-received').innerText = d.notReceivedP4P;
+                
+                // รายชื่อเข้าใหม่/ออก
+                document.getElementById('dash-new-hires').innerHTML = d.newHires.length > 0 ? d.newHires.map(u => `<li><i class="fas fa-check-circle text-green-500 mr-2"></i> ${u.name} <span class="text-xs text-gray-400">(${u.group})</span></li>`).join('') : '<li class="italic text-gray-400">ไม่มีบุคลากรเข้าใหม่</li>';
+                document.getElementById('dash-resigned').innerHTML = d.resigned.length > 0 ? d.resigned.map(u => `<li><i class="fas fa-times-circle text-red-500 mr-2"></i> ${u.name} <span class="text-xs text-gray-400">(${u.group})</span></li>`).join('') : '<li class="italic text-gray-400">ไม่มีบุคลากรลาออก</li>';
+
+                // วาดกราฟ
+                if(dashboardChart) dashboardChart.destroy();
+                let ctx = document.getElementById('p4pChart').getContext('2d');
+                dashboardChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ได้รับ P4P', 'ไม่ได้รับ P4P', 'ยังไม่บันทึก'],
+                        datasets: [{
+                            label: 'จำนวนคน',
+                            data: [d.receivedP4P, d.notReceivedP4P, (d.totalActive - d.enteredCount)],
+                            backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(203, 213, 225, 0.8)'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                });
+            } else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        // === Loading Users ===
         async function loadUsers() {
             if(String(currentUser.role||'').trim().toLowerCase() !== 'admin') {
                 initTomSelect([{ user_id: currentUser.id, name: currentUser.name, group_name: currentUser.group }], true);
                 return;
             }
-            
             let data = await apiCall('getUsers', {});
             if(data.status === 'success') {
                 cachedUsers = data.data.filter(u => u.user_id && u.name);
-                
                 let groups = [...new Set(cachedUsers.map(u => u.group_name))];
                 document.getElementById('score-group-filter').innerHTML = `<option value="ALL">-- แสดงทุกกลุ่ม --</option>` + groups.map(g => `<option value="${g}">${g}</option>`).join('');
-                
                 renderUserTable();
                 await refreshScoreDropdown();
             }
         }
 
-        // ฟังก์ชันตรวจสอบสถานะทำงานจากเดือน/ปี 
         function isUserActiveInPeriod(u, calcM, calcY) {
-            calcM = parseInt(calcM);
-            calcY = parseInt(calcY);
-            
-            if(u.start_year && u.start_month) {
-                let sy = parseInt(u.start_year), sm = parseInt(u.start_month);
-                if(calcY < sy || (calcY === sy && calcM < sm)) return false; 
-            }
-            if(u.end_year && u.end_month) {
-                let ey = parseInt(u.end_year), em = parseInt(u.end_month);
-                if(calcY > ey || (calcY === ey && calcM >= em)) return false; 
-            }
-            if (u.status === 'Inactive' && !(u.end_year && u.end_month)) {
-               return false;
-            }
+            calcM = parseInt(calcM); calcY = parseInt(calcY);
+            if(u.start_year && u.start_month) { let sy = parseInt(u.start_year), sm = parseInt(u.start_month); if(calcY < sy || (calcY === sy && calcM < sm)) return false; }
+            if(u.end_year && u.end_month) { let ey = parseInt(u.end_year), em = parseInt(u.end_month); if(calcY > ey || (calcY === ey && calcM >= em)) return false; }
+            if (u.status === 'Inactive' && !(u.end_year && u.end_month)) return false;
             return true;
         }
 
         async function refreshScoreDropdown() {
-            let m = document.getElementById('score-month').value;
-            let y = document.getElementById('score-year').value;
+            let m = document.getElementById('score-month').value, y = document.getElementById('score-year').value;
             let res = await apiCall('getScores', { month: m, year: y });
-            
-            if(res.status === 'success') {
-                currentScoredUsers = res.data.map(s => String(s.user_id));
-            } else {
-                currentScoredUsers = [];
-            }
+            currentScoredUsers = res.status === 'success' ? res.data.map(s => String(s.user_id)) : [];
             filterUsersByGroup();
         }
 
         function filterUsersByGroup() {
-            let g = document.getElementById('score-group-filter').value;
-            let m = document.getElementById('score-month').value;
-            let y = document.getElementById('score-year').value;
-            
+            let g = document.getElementById('score-group-filter').value, m = document.getElementById('score-month').value, y = document.getElementById('score-year').value;
             let available = cachedUsers.filter(u => {
                 let alreadyScored = currentScoredUsers.includes(String(u.user_id));
                 let isEditingThisUser = (String(u.user_id) === String(currentlyEditingUserId));
-                
                 let isActive = isUserActiveInPeriod(u, m, y);
-
                 return isActive && (!alreadyScored || isEditingThisUser);
             });
-
             if(g !== "ALL") available = available.filter(u => u.group_name === g);
-
             initTomSelect(available);
-            if(currentlyEditingUserId && tomSelectInstance) {
-                tomSelectInstance.setValue(currentlyEditingUserId);
-            }
+            if(currentlyEditingUserId && tomSelectInstance) tomSelectInstance.setValue(currentlyEditingUserId);
         }
 
         function initTomSelect(arr, lock = false) {
             if(tomSelectInstance) tomSelectInstance.destroy();
             let el = document.getElementById('score-user');
             el.innerHTML = arr.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
-            tomSelectInstance = new TomSelect(el, { 
-                create: false, 
-                sortField: { field: "text", direction: "asc" }, 
-                placeholder: "คลิกเพื่อเลือก หรือ พิมพ์ชื่อ..." 
-            });
+            tomSelectInstance = new TomSelect(el, { create: false, sortField: { field: "text", direction: "asc" }, placeholder: "คลิกเพื่อเลือก หรือ พิมพ์ชื่อ..." });
             if(lock) tomSelectInstance.disable();
         }
 
@@ -517,7 +606,6 @@
             document.getElementById('form-reason').classList.toggle('hidden', isP4P);
         }
 
-        // ฟังก์ชันล้างค่ากลับเป็นค่าตั้งต้นหลังบันทึก
         function resetScoreForm() {
             document.getElementById('score-status').value = 'ได้รับ P4P';
             document.getElementById('raw-score-input').value = '';
@@ -528,173 +616,65 @@
 
         async function submitScore() {
             let currentStatus = document.getElementById('score-status').value;
-            
-            // ดักเคลียร์ค่าที่ไม่เกี่ยวกับสถานะ
             let finalScore = currentStatus === 'ได้รับ P4P' ? document.getElementById('raw-score-input').value : '';
             let finalReason = currentStatus === 'ไม่ได้รับ P4P' ? document.getElementById('reason-input').value : '';
 
-            let payload = {
-                user_id: document.getElementById('score-user').value, 
-                month: document.getElementById('score-month').value,
-                year: document.getElementById('score-year').value, 
-                status: currentStatus,
-                raw_score: finalScore, 
-                reason: finalReason
-            };
-
+            let payload = { user_id: document.getElementById('score-user').value, month: document.getElementById('score-month').value, year: document.getElementById('score-year').value, status: currentStatus, raw_score: finalScore, reason: finalReason };
             if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
-            
-            if(currentStatus === 'ได้รับ P4P' && payload.raw_score === '') {
-                return Swal.fire('แจ้งเตือน', 'กรุณากรอกคะแนนดิบรวม', 'warning');
-            }
+            if(currentStatus === 'ได้รับ P4P' && payload.raw_score === '') return Swal.fire('แจ้งเตือน', 'กรุณากรอกคะแนนดิบรวม', 'warning');
 
             let res = await apiCall('saveScore', payload);
-            if(res.status === 'success') { 
-                Swal.fire('สำเร็จ', res.message, 'success'); 
-                resetScoreForm();
-                currentlyEditingUserId = null; 
-                await refreshScoreDropdown(); 
-            } else {
-                Swal.fire('ผิดพลาด', res.message, 'error');
-            }
+            if(res.status === 'success') { Swal.fire('สำเร็จ', res.message, 'success'); resetScoreForm(); currentlyEditingUserId = null; await refreshScoreDropdown(); } 
+            else Swal.fire('ผิดพลาด', res.message, 'error');
         }
 
         async function loadScoreSummary() {
-            let m = document.getElementById('summary-month').value;
-            let y = document.getElementById('summary-year').value;
+            let m = document.getElementById('summary-month').value, y = document.getElementById('summary-year').value;
             let res = await apiCall('getScores', { month: m, year: y });
-            
             if(res.status === 'success') {
                 let html = res.data.map(s => {
                     let user = cachedUsers.find(u => String(u.user_id) === String(s.user_id)) || { name: 'ไม่พบในระบบ', group_name: '-' };
-                    let statusClass = s.status === 'ได้รับ P4P' ? 'text-green-600 bg-green-50 px-2 py-1 rounded-md' : 'text-red-600 bg-red-50 px-2 py-1 rounded-md';
+                    let statusClass = s.status === 'ได้รับ P4P' ? 'text-green-700 bg-green-100/50 px-2 py-1 rounded border border-green-200' : 'text-red-700 bg-red-100/50 px-2 py-1 rounded border border-red-200';
                     return `
                         <tr class="border-b hover:bg-blue-50 transition-colors">
-                            <td class="px-4 py-3">${user.name}</td>
-                            <td class="px-4 py-3 text-gray-600">${user.group_name}</td>
-                            <td class="px-4 py-3 font-semibold"><span class="${statusClass}">${s.status}</span></td>
-                            <td class="px-4 py-3 text-right font-bold text-gray-800">${s.status === 'ได้รับ P4P' ? s.raw_score : '-'}</td>
-                            <td class="px-4 py-3 text-gray-500">${s.reason || '-'}</td>
-                            <td class="px-4 py-3 text-center">
-                                <button onclick="editRecordedScore('${s.user_id}', '${s.status}', '${s.raw_score}', '${s.reason}', '${m}', '${y}')" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-xs hover:bg-blue-200 shadow-sm font-medium"><i class="fas fa-edit mr-1"></i> แก้ไข</button>
-                            </td>
+                            <td class="px-5 py-4 font-medium text-blue-900">${user.name}</td><td class="px-5 py-4 text-gray-600">${user.group_name}</td>
+                            <td class="px-5 py-4 text-center font-bold">${statusClass.includes('green') ? '<i class="fas fa-check-circle text-green-500 mr-1"></i>':'<i class="fas fa-times-circle text-red-500 mr-1"></i>'} <span class="${statusClass}">${s.status}</span></td>
+                            <td class="px-5 py-4 text-right font-bold text-gray-800 text-lg">${s.status === 'ได้รับ P4P' ? s.raw_score : '-'}</td>
+                            <td class="px-5 py-4 text-gray-500 text-sm">${s.reason || '-'}</td>
+                            <td class="px-5 py-4 text-center"><button onclick="editRecordedScore('${s.user_id}', '${s.status}', '${s.raw_score}', '${s.reason}', '${m}', '${y}')" class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 hover:text-blue-600 shadow-sm font-bold transition-all"><i class="fas fa-edit mr-1"></i> แก้ไข</button></td>
                         </tr>
                     `;
                 }).join('');
-                document.getElementById('score-summary-tbody').innerHTML = html || `<tr><td colspan="6" class="text-center py-8 text-red-500 font-medium bg-red-50">ไม่มีข้อมูลการบันทึกในเดือนที่เลือก</td></tr>`;
-            } else {
-                Swal.fire('ผิดพลาด', res.message, 'error');
-            }
+                document.getElementById('score-summary-tbody').innerHTML = html || `<tr><td colspan="6" class="text-center py-10 text-red-500 bg-red-50"><i class="fas fa-box-open text-3xl mb-3 block text-red-300"></i> ไม่มีข้อมูลการบันทึกในเดือนที่เลือก</td></tr>`;
+            } else Swal.fire('ผิดพลาด', res.message, 'error');
         }
 
         function editRecordedScore(uid, status, score, reason, m, y) {
-            document.getElementById('score-month').value = m;
-            document.getElementById('score-year').value = y;
-            document.getElementById('score-status').value = status;
-            document.getElementById('raw-score-input').value = score || '';
-            document.getElementById('reason-input').value = reason || 'ทำงานไม่ครบ 15 วัน';
-            
-            currentlyEditingUserId = uid; 
-            toggleScoreForm();
-            switchPage('scoring');
-            refreshScoreDropdown(); 
+            document.getElementById('score-month').value = m; document.getElementById('score-year').value = y; document.getElementById('score-status').value = status;
+            document.getElementById('raw-score-input').value = score || ''; document.getElementById('reason-input').value = reason || 'ทำงานไม่ครบ 15 วัน';
+            currentlyEditingUserId = uid; toggleScoreForm(); switchPage('scoring'); refreshScoreDropdown(); 
         }
 
-        // === 4. จัดการงบประมาณ ===
+        // === งบประมาณ & บุคลากร CRUD ===
         async function loadBudgets() {
             let data = await apiCall('getBudgets', {});
             if(data.status === 'success') {
                 let budgets = data.data.filter(b => b.month && b.year).sort((a,b) => (b.year + b.month) - (a.year + a.month));
-                document.getElementById('budget-tbody').innerHTML = budgets.map(b => `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-4 py-3 font-medium">${mNames[b.month]} ${b.year}</td>
-                        <td class="px-4 py-3 text-right font-bold text-blue-700">${parseFloat(b.total_amount).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                        <td class="px-4 py-3 text-center"><button onclick="editBudget('${b.month}', '${b.year}', '${b.total_amount}')" class="text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full text-xs hover:bg-indigo-100 border border-indigo-200 font-medium">แก้ไข</button></td>
-                    </tr>
-                `).join('') || `<tr><td colspan="3" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลงบประมาณ</td></tr>`;
+                document.getElementById('budget-tbody').innerHTML = budgets.map(b => `<tr class="border-b hover:bg-gray-50"><td class="px-5 py-4 font-bold text-gray-700">${mNames[b.month]} ${b.year}</td><td class="px-5 py-4 text-right font-bold text-blue-700 text-lg">${parseFloat(b.total_amount).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td class="px-5 py-4 text-center"><button onclick="editBudget('${b.month}', '${b.year}', '${b.total_amount}')" class="text-navy-900 bg-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 shadow-sm font-bold">แก้ไข</button></td></tr>`).join('') || `<tr><td colspan="3" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลงบประมาณ</td></tr>`;
             }
         }
+        function editBudget(m, y, amt) { document.getElementById('budget-month').value=m; document.getElementById('budget-year').value=y; document.getElementById('budget-amount').value=amt; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function submitBudget() { let amt = document.getElementById('budget-amount').value; if(!amt) return Swal.fire('แจ้งเตือน','กรุณาระบุจำนวนเงิน','warning'); let res = await apiCall('saveBudget', {month:document.getElementById('budget-month').value, year:document.getElementById('budget-year').value, amount:amt}); if(res.status==='success') { Swal.fire('สำเร็จ',res.message,'success'); document.getElementById('budget-amount').value = ''; loadBudgets(); } }
 
-        function editBudget(m, y, amt) { 
-            document.getElementById('budget-month').value=m; 
-            document.getElementById('budget-year').value=y; 
-            document.getElementById('budget-amount').value=amt; 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        async function submitBudget() { 
-            let amt = document.getElementById('budget-amount').value; 
-            if(!amt) return Swal.fire('แจ้งเตือน','กรุณาระบุจำนวนเงิน','warning'); 
-            let res = await apiCall('saveBudget', {month:document.getElementById('budget-month').value, year:document.getElementById('budget-year').value, amount:amt}); 
-            if(res.status==='success') { Swal.fire('สำเร็จ',res.message,'success'); document.getElementById('budget-amount').value = ''; loadBudgets(); } 
-            else Swal.fire('ผิดพลาด',res.message,'error');
-        }
-
-        // === 5. จัดการบุคลากร (CRUD & Deactivate) ===
         function renderUserTable() { 
             document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => {
-                let statusBadge = (u.status === 'Inactive') ? '<span class="px-2 py-1 rounded bg-red-100 text-red-800 text-xs">ระงับสิทธิ์</span>' : '<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs">ใช้งาน</span>';
-                
-                return `
-                <tr class="border-b hover:bg-gray-50 text-xs md:text-sm ${u.status === 'Inactive' ? 'opacity-60' : ''}">
-                    <td class="px-4 py-3"><span class="font-bold text-gray-700">${u.user_id}</span><br><span class="text-gray-400">${u.username}</span></td>
-                    <td class="px-4 py-3 font-medium text-blue-800">${u.name}</td>
-                    <td class="px-4 py-3 text-gray-600">${u.group_name}</td>
-                    <td class="px-4 py-3 text-center">${statusBadge}</td>
-                    <td class="px-4 py-3 text-green-600">${u.start_year ? u.start_month+'/'+u.start_year : '-'}</td>
-                    <td class="px-4 py-3 text-red-500">${u.end_year ? u.end_month+'/'+u.end_year : '-'}</td>
-                    <td class="px-4 py-3 text-center whitespace-nowrap">
-                        <button onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 bg-blue-50 p-2 rounded-lg mx-0.5 hover:bg-blue-100 border border-blue-200" title="แก้ไข"><i class="fas fa-edit"></i></button>
-                        ${u.status !== 'Inactive' ? `<button onclick='deactivateUser("${u.user_id}")' class="text-orange-600 bg-orange-50 p-2 rounded-lg mx-0.5 hover:bg-orange-100 border border-orange-200" title="ระงับสิทธิ์"><i class="fas fa-user-slash"></i></button>` : ''}
-                    </td>
-                </tr>
-            `}).join(''); 
+                let statusBadge = (u.status === 'Inactive') ? '<span class="px-2 py-1 rounded bg-red-100 text-red-800 text-xs font-bold">ระงับสิทธิ์</span>' : '<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs font-bold">Active</span>';
+                return `<tr class="border-b hover:bg-gray-50 text-xs md:text-sm ${u.status === 'Inactive' ? 'opacity-50' : ''}"><td class="px-5 py-3"><span class="font-bold text-navy-900">${u.user_id}</span><br><span class="text-gray-400">${u.username}</span></td><td class="px-5 py-3 font-bold text-blue-800">${u.name}</td><td class="px-5 py-3 text-gray-600">${u.group_name}</td><td class="px-5 py-3 text-center">${statusBadge}</td><td class="px-5 py-3 text-gray-600 font-medium">${u.start_year ? u.start_month+'/'+u.start_year : '-'}</td><td class="px-5 py-3 text-red-500 font-medium">${u.end_year ? u.end_month+'/'+u.end_year : '-'}</td><td class="px-5 py-3 text-center whitespace-nowrap"><button onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mx-0.5 hover:bg-blue-50" title="แก้ไข"><i class="fas fa-edit"></i></button>${u.status !== 'Inactive' ? `<button onclick='deactivateUser("${u.user_id}")' class="text-orange-500 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mx-0.5 hover:bg-orange-50" title="ระงับสิทธิ์"><i class="fas fa-user-slash"></i></button>` : ''}</td></tr>`}).join(''); 
         }
-
-        function openUserModal(user=null) { 
-            document.getElementById('user-modal').classList.remove('hidden'); 
-            if(user) { 
-                document.getElementById('m-id').value=user.user_id; document.getElementById('m-id').readOnly=true; document.getElementById('m-id').classList.add('bg-gray-100');
-                document.getElementById('m-user').value=user.username; document.getElementById('m-pass').value=user.password;
-                document.getElementById('m-name').value=user.name; document.getElementById('m-group').value=user.group_name;
-                document.getElementById('m-guarantee').value=user.guarantee_score; document.getElementById('m-role').value=user.role;
-                document.getElementById('m-status').value = user.status || 'Active';
-                document.getElementById('m-s-m').value=user.start_month; document.getElementById('m-s-y').value=user.start_year;
-                document.getElementById('m-e-m').value=user.end_month; document.getElementById('m-e-y').value=user.end_year;
-                document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-edit mr-2'></i>แก้ไขข้อมูล"; 
-            } else { 
-                ['m-id','m-user','m-pass','m-name','m-group','m-s-m','m-e-m','m-e-y'].forEach(id=>document.getElementById(id).value=''); 
-                document.getElementById('m-id').readOnly=false; document.getElementById('m-id').classList.remove('bg-gray-100');
-                document.getElementById('m-s-y').value='2567'; document.getElementById('m-guarantee').value='600'; document.getElementById('m-role').value='User';
-                document.getElementById('m-status').value = 'Active';
-                document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-plus mr-2'></i>เพิ่มบุคลากร"; 
-            } 
-        }
-
+        function openUserModal(user=null) { document.getElementById('user-modal').classList.remove('hidden'); if(user) { document.getElementById('m-id').value=user.user_id; document.getElementById('m-id').readOnly=true; document.getElementById('m-id').classList.add('bg-gray-100'); document.getElementById('m-user').value=user.username; document.getElementById('m-pass').value=user.password; document.getElementById('m-name').value=user.name; document.getElementById('m-group').value=user.group_name; document.getElementById('m-guarantee').value=user.guarantee_score; document.getElementById('m-role').value=user.role; document.getElementById('m-status').value = user.status || 'Active'; document.getElementById('m-s-m').value=user.start_month; document.getElementById('m-s-y').value=user.start_year; document.getElementById('m-e-m').value=user.end_month; document.getElementById('m-e-y').value=user.end_year; document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-edit mr-2 text-blue-400'></i>แก้ไขข้อมูล"; } else { ['m-id','m-user','m-pass','m-name','m-group','m-s-m','m-e-m','m-e-y'].forEach(id=>document.getElementById(id).value=''); document.getElementById('m-id').readOnly=false; document.getElementById('m-id').classList.remove('bg-gray-100'); document.getElementById('m-s-y').value='2567'; document.getElementById('m-guarantee').value='600'; document.getElementById('m-role').value='User'; document.getElementById('m-status').value = 'Active'; document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-plus mr-2 text-blue-400'></i>เพิ่มบุคลากร"; } }
         function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
-
-        async function submitUser() { 
-            let payload = { 
-                user_id: document.getElementById('m-id').value, username: document.getElementById('m-user').value, 
-                password: document.getElementById('m-pass').value, name: document.getElementById('m-name').value, 
-                group_name: document.getElementById('m-group').value, guarantee_score: document.getElementById('m-guarantee').value, 
-                role: document.getElementById('m-role').value, status: document.getElementById('m-status').value,
-                start_month: document.getElementById('m-s-m').value, start_year: document.getElementById('m-s-y').value, 
-                end_month: document.getElementById('m-e-m').value, end_year: document.getElementById('m-e-y').value 
-            }; 
-            if(!payload.user_id || !payload.name) return Swal.fire('แจ้งเตือน', 'รหัสและชื่อห้ามว่าง', 'warning'); 
-            let res = await apiCall('saveUser', payload); 
-            if(res.status==='success') { closeUserModal(); Swal.fire('สำเร็จ',res.message,'success'); loadUsers(); } 
-            else Swal.fire('ผิดพลาด',res.message,'error');
-        }
-
-        async function deactivateUser(id) { 
-            if(confirm("ยืนยันการระงับสิทธิ์ รหัส "+id+" หรือไม่? (ข้อมูลการคำนวณย้อนหลังจะยังคงอยู่)")) { 
-                let res = await apiCall('deactivateUser', {user_id:id}); 
-                if(res.status==='success') { Swal.fire('ระงับสิทธิ์สำเร็จ',res.message,'success'); loadUsers(); } 
-                else Swal.fire('ผิดพลาด',res.message,'error');
-            } 
-        }
+        async function submitUser() { let payload = { user_id: document.getElementById('m-id').value, username: document.getElementById('m-user').value, password: document.getElementById('m-pass').value, name: document.getElementById('m-name').value, group_name: document.getElementById('m-group').value, guarantee_score: document.getElementById('m-guarantee').value, role: document.getElementById('m-role').value, status: document.getElementById('m-status').value, start_month: document.getElementById('m-s-m').value, start_year: document.getElementById('m-s-y').value, end_month: document.getElementById('m-e-m').value, end_year: document.getElementById('m-e-y').value }; if(!payload.user_id || !payload.name) return Swal.fire('แจ้งเตือน', 'รหัสและชื่อห้ามว่าง', 'warning'); let res = await apiCall('saveUser', payload); if(res.status==='success') { closeUserModal(); Swal.fire('สำเร็จ',res.message,'success'); loadUsers(); } else Swal.fire('ผิดพลาด',res.message,'error'); }
+        async function deactivateUser(id) { if(confirm("ยืนยันการระงับสิทธิ์ รหัส "+id+" หรือไม่?")) { let res = await apiCall('deactivateUser', {user_id:id}); if(res.status==='success') { Swal.fire('ระงับสิทธิ์สำเร็จ',res.message,'success'); loadUsers(); } } }
 
         // === 6. การประมวลผล ===
         async function runCalculation() {
@@ -703,85 +683,67 @@
             
             if(res.status === 'success') {
                 let dateStr = `ประจำเดือน ${mNames[m]} พ.ศ. ${y}`;
-                document.getElementById('ind-report-date').innerText = dateStr; 
-                document.getElementById('group-report-date').innerText = dateStr;
+                document.getElementById('ind-report-date').innerText = dateStr; document.getElementById('group-report-date').innerText = dateStr;
 
-                // ตาราง Check 90/10
                 document.getElementById('summary-tbody').innerHTML = res.summary.map(s => `
-                    <tr class="border-b hover:bg-yellow-50">
-                        <td class="px-3 py-2 border-r text-gray-800">${s.group}</td>
-                        <td class="px-3 py-2 text-right border-r text-gray-600">${s.weight}</td>
-                        <td class="px-3 py-2 text-right border-r text-gray-600">${s.count}</td>
-                        <td class="px-3 py-2 text-right border-r font-bold text-blue-800 bg-blue-50/50">${s.group_money.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
-                        <td class="px-3 py-2 text-right border-r text-gray-600">${s.pool90.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
-                        <td class="px-3 py-2 text-right border-r text-gray-600">${s.pool10.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
-                        <td class="px-3 py-2 text-right border-r font-bold text-green-700 bg-green-50/50">${s.actual_pay.toLocaleString()}</td>
-                        <td class="px-3 py-2 text-right ${Math.abs(s.check)>1?'text-red-500 font-bold bg-red-50':''}">${Math.round(s.check*100)/100}</td>
+                    <tr class="border-b hover:bg-blue-50 transition-colors">
+                        <td class="px-4 py-3 border-r font-bold text-navy-900">${s.group}</td>
+                        <td class="px-4 py-3 text-right border-r text-gray-600">${s.weight}</td>
+                        <td class="px-4 py-3 text-right border-r text-gray-600">${s.count}</td>
+                        <td class="px-4 py-3 text-right border-r font-bold text-blue-800 bg-blue-50/50">${s.group_money.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                        <td class="px-4 py-3 text-right border-r text-gray-600">${s.pool90.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+                        <td class="px-4 py-3 text-right border-r text-gray-600">${s.pool10.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+                        <td class="px-4 py-3 text-right border-r font-bold text-green-700 bg-green-50">${s.actual_pay.toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right font-medium ${Math.abs(s.check)>1?'text-red-500 bg-red-50':'text-gray-400'}">${Math.round(s.check*100)/100}</td>
                     </tr>
                 `).join('');
 
-                // ตาราง Ind
                 document.getElementById('report-ind-tbody').innerHTML = res.data.map((r, i) => `
-                    <tr class="border-b-2 border-gray-200">
-                        <td class="px-4 py-2 text-center border-r-2 border-gray-900">${i+1}</td>
-                        <td class="px-4 py-2 border-r-2 border-gray-900">${r.name}</td>
-                        <td class="px-4 py-2 border-r-2 border-gray-900">${r.group}</td>
-                        <td class="px-4 py-2 text-right font-medium text-lg">${r.pay}</td>
+                    <tr class="border-b border-gray-300">
+                        <td class="px-5 py-3 text-center border-r-2 border-gray-900">${i+1}</td>
+                        <td class="px-5 py-3 border-r-2 border-gray-900">${r.name}</td>
+                        <td class="px-5 py-3 border-r-2 border-gray-900">${r.group}</td>
+                        <td class="px-5 py-3 text-right font-bold text-lg">${r.pay}</td>
                     </tr>
                 `).join('');
 
-                // ตาราง Group
                 let totalFin = 0; 
                 document.getElementById('report-group-tbody').innerHTML = res.finance.map((f, i) => { 
                     totalFin+=f.total; 
-                    return `
-                    <tr class="border-b-2 border-gray-200">
-                        <td class="px-4 py-2 text-center border-r-2 border-gray-900">${i+1}</td>
-                        <td class="px-4 py-2 border-r-2 border-gray-900">${f.group}</td>
-                        <td class="px-4 py-2 text-right font-medium text-lg">${f.total.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-                    </tr>
-                `}).join(''); 
+                    return `<tr class="border-b border-gray-300"><td class="px-5 py-3 text-center border-r-2 border-gray-900">${i+1}</td><td class="px-5 py-3 border-r-2 border-gray-900 font-bold">${f.group}</td><td class="px-5 py-3 text-right font-bold text-lg">${f.total.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`
+                }).join(''); 
                 document.getElementById('group-report-total').innerText = totalFin.toLocaleString('en-US',{minimumFractionDigits:2});
                 
-                Swal.fire('ประมวลผลสำเร็จ', 'สามารถคลิกดูรายงานและสั่งพิมพ์ได้ที่เมนูซ้ายมือ', 'success');
-            } else {
-                Swal.fire('ข้อผิดพลาด', res.message, 'error');
-            }
+                Swal.fire('ประมวลผลสำเร็จ', 'ไปที่เมนูรายงานทางการเงินเพื่อดูข้อมูลและสั่งพิมพ์', 'success');
+            } else Swal.fire('ข้อผิดพลาด', res.message, 'error');
         }
 
-        // === Navigation ===
         function switchPage(pageId) {
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
             document.getElementById('page-' + pageId).classList.remove('hidden');
             
             document.querySelectorAll('.nav-link').forEach(el => { 
-                el.classList.remove('bg-slate-700', 'text-white'); 
-                el.classList.add('hover:bg-slate-700', 'text-gray-300'); 
+                el.classList.remove('bg-blue-600/20', 'text-white', 'border', 'border-blue-500/30'); 
+                el.classList.add('hover:bg-slate-800', 'text-gray-300'); 
             });
             
             if (window.event && window.event.currentTarget.classList) { 
-                window.event.currentTarget.classList.add('bg-slate-700', 'text-white'); 
-                window.event.currentTarget.classList.remove('hover:bg-slate-700', 'text-gray-300'); 
+                window.event.currentTarget.classList.add('bg-blue-600/20', 'text-white', 'border', 'border-blue-500/30'); 
+                window.event.currentTarget.classList.remove('hover:bg-slate-800', 'text-gray-300'); 
                 document.getElementById('topbar-title').innerText = window.event.currentTarget.innerText.trim(); 
             }
 
-            if(['calculation', 'report-ind', 'report-group'].includes(pageId)) {
-                document.getElementById('calc-controls').classList.remove('hidden'); 
-            } else {
-                document.getElementById('calc-controls').classList.add('hidden');
-            }
+            if(['calculation', 'report-ind', 'report-group'].includes(pageId)) document.getElementById('calc-controls').classList.remove('hidden'); 
+            else document.getElementById('calc-controls').classList.add('hidden');
             
+            if(pageId === 'dashboard') loadDashboard();
             if(pageId === 'budget') loadBudgets();
             if(pageId === 'score-summary') loadScoreSummary();
             if(pageId === 'scoring') refreshScoreDropdown();
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        function toggleSidebar() { 
-            document.getElementById('sidebar').classList.toggle('-translate-x-full'); 
-            document.getElementById('sidebar-backdrop').classList.toggle('hidden'); 
-        }
-
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-backdrop').classList.toggle('hidden'); }
         function logout() { location.reload(); }
     </script>
 </body>
