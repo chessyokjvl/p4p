@@ -538,15 +538,27 @@
         }
 
         async function submitScore() {
+            let currentStatus = document.getElementById('score-status').value;
+            
+            // แก้บั๊ก: เคลียร์ค่าที่ไม่ได้ใช้ทิ้งก่อนส่งไปบันทึก
+            let finalScore = currentStatus === 'ได้รับ P4P' ? document.getElementById('raw-score-input').value : '';
+            let finalReason = currentStatus === 'ไม่ได้รับ P4P' ? document.getElementById('reason-input').value : '';
+
             let payload = {
                 user_id: document.getElementById('score-user').value, 
                 month: document.getElementById('score-month').value,
                 year: document.getElementById('score-year').value, 
-                status: document.getElementById('score-status').value,
-                raw_score: document.getElementById('raw-score-input').value, 
-                reason: document.getElementById('reason-input').value
+                status: currentStatus,
+                raw_score: finalScore, 
+                reason: finalReason
             };
+
             if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
+            
+            // ดักจับเพิ่มเติม: ถ้าได้รับ P4P แต่ลืมกรอกคะแนนดิบ
+            if(currentStatus === 'ได้รับ P4P' && payload.raw_score === '') {
+                return Swal.fire('แจ้งเตือน', 'กรุณากรอกคะแนนดิบรวม', 'warning');
+            }
 
             let res = await apiCall('saveScore', payload);
             if(res.status === 'success') { 
