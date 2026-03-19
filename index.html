@@ -15,7 +15,6 @@
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
         .ts-control { padding: 0.75rem 1rem; border-radius: 0.5rem; border-color: #e5e7eb; font-size: 0.875rem; }
         
-        /* สไตล์หน้า Login แบบหรูหรา (Glassmorphism) */
         .glass-panel {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(16px);
@@ -48,15 +47,11 @@
             
             <div class="space-y-6">
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-user text-blue-300"></i>
-                    </div>
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-user text-blue-300"></i></div>
                     <input type="text" id="username" class="w-full pl-12 pr-4 py-4 bg-white/10 border border-blue-300/30 rounded-xl focus:ring-2 focus:ring-blue-400 focus:bg-white/20 text-white placeholder-blue-300 transition-all outline-none" placeholder="Username (รหัสผู้ใช้งาน)">
                 </div>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-lock text-blue-300"></i>
-                    </div>
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-lock text-blue-300"></i></div>
                     <input type="password" id="password" class="w-full pl-12 pr-4 py-4 bg-white/10 border border-blue-300/30 rounded-xl focus:ring-2 focus:ring-blue-400 focus:bg-white/20 text-white placeholder-blue-300 transition-all outline-none" placeholder="Password (รหัสผ่าน)">
                 </div>
                 <button onclick="login()" id="btn-login" class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-bold py-4 px-4 rounded-xl shadow-lg transform transition-transform duration-200 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-500/50 mt-4 text-lg">
@@ -108,7 +103,7 @@
             <div id="page-scoring" class="page max-w-3xl mx-auto">
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                        <p class="text-sm text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>คำแนะนำ:</strong> รายชื่อบุคลากรที่บันทึกคะแนนในเดือนนั้นไปแล้ว จะถูกซ่อนอัตโนมัติ</p>
+                        <p class="text-sm text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>คำแนะนำ:</strong> รายชื่อบุคลากรที่บันทึกคะแนนในเดือนนั้นไปแล้ว (หรือไม่ได้อยู่ในช่วงปฏิบัติงาน) จะถูกซ่อนอัตโนมัติ</p>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -157,9 +152,9 @@
                         <select id="reason-input" class="w-full border-red-300 rounded-lg shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 p-2.5 border bg-red-50">
                             <option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน</option>
                             <option value="ไม่ส่ง">ไม่ส่งคะแนน</option>
-                            <option value="ลาคลอด">ลาคลอด</option>
                             <option value="เรียน PG">เรียน PG</option>
                             <option value="ลาศึกษาต่อ">ลาศึกษาต่อ</option>
+                            <option value="ลาคลอด">ลาคลอด</option>
                             <option value="ยังไม่เริ่มปฏิบัติงาน">ยังไม่เริ่มปฏิบัติงาน</option>
                             <option value="ออกจากงานไปแล้ว">ออกจากงานไปแล้ว</option>
                             <option value="อื่นๆ">อื่นๆ</option>
@@ -220,7 +215,7 @@
                     <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">จำนวนเงินงบประมาณ (บาท)</label><input type="number" id="budget-amount" class="w-full border-green-300 rounded-lg p-3 border bg-green-50 text-green-800 font-bold text-lg" placeholder="ระบุตัวเลข"></div>
                     <button onclick="submitBudget()" class="bg-green-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-green-700 shadow-md transition-colors"><i class="fas fa-save mr-2"></i> บันทึกงบประมาณ</button>
                 </div>
-
+                
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
                     <h2 class="text-lg font-bold mb-4 pb-2 border-b text-gray-800"><i class="fas fa-history text-gray-500 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
                     <div class="overflow-x-auto rounded-lg border">
@@ -243,7 +238,7 @@
                     <div class="overflow-x-auto rounded-lg border">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50 border-b">
-                                <tr><th class="px-4 py-3 text-left font-semibold text-gray-600">ID / Username</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ชื่อ-สกุล</th><th class="px-4 py-3 text-left font-semibold text-gray-600">กลุ่มงาน</th><th class="px-4 py-3 text-left font-semibold text-gray-600">สิทธิ์</th><th class="px-4 py-3 text-left font-semibold text-gray-600">เริ่มงาน</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ออกงาน</th><th class="px-4 py-3 text-center font-semibold text-gray-600">จัดการ</th></tr>
+                                <tr><th class="px-4 py-3 text-left font-semibold text-gray-600">ID / Username</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ชื่อ-สกุล</th><th class="px-4 py-3 text-left font-semibold text-gray-600">กลุ่มงาน</th><th class="px-4 py-3 text-center font-semibold text-gray-600">สถานะ</th><th class="px-4 py-3 text-left font-semibold text-gray-600">เริ่มงาน</th><th class="px-4 py-3 text-left font-semibold text-gray-600">ออกงาน</th><th class="px-4 py-3 text-center font-semibold text-gray-600">จัดการ</th></tr>
                             </thead>
                             <tbody id="personnel-tbody" class="divide-y divide-gray-200 bg-white"></tbody>
                         </table>
@@ -265,7 +260,8 @@
                         <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">ชื่อ-สกุล</label><input type="text" id="m-name" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
                         <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">กลุ่มงาน</label><input type="text" id="m-group" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></div>
                         <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">แต้มประกัน</label><input type="number" id="m-guarantee" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="600"></div>
-                        <div class="sm:col-span-2"><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">สิทธิ์ (Role)</label><select id="m-role" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="User">User (ผู้ใช้งานทั่วไป)</option><option value="Admin">Admin (ผู้ดูแลระบบ)</option></select></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">สิทธิ์ (Role)</label><select id="m-role" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="User">User</option><option value="Admin">Admin</option></select></div>
+                        <div><label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">สถานะการใช้งาน</label><select id="m-status" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="Active">Active (ใช้งาน)</option><option value="Inactive">Inactive (ระงับการใช้งาน)</option></select></div>
                         
                         <div class="sm:col-span-2 border-t mt-2 pt-4">
                             <p class="text-sm font-bold text-indigo-700 mb-4"><i class="fas fa-calendar-alt mr-2"></i> กำหนดระยะเวลาการทำงาน (ตัดอัตรากำลังอัตโนมัติ)</p>
@@ -394,7 +390,7 @@
         // รองรับการกด Enter
         document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
 
-        // === API Call Handler (Full version) ===
+        // === API Call Handler ===
         async function apiCall(action, payload) {
             Swal.showLoading();
             try {
@@ -459,6 +455,25 @@
             }
         }
 
+        // ฟังก์ชันตรวจสอบสถานะทำงานจากเดือน/ปี 
+        function isUserActiveInPeriod(u, calcM, calcY) {
+            calcM = parseInt(calcM);
+            calcY = parseInt(calcY);
+            
+            if(u.start_year && u.start_month) {
+                let sy = parseInt(u.start_year), sm = parseInt(u.start_month);
+                if(calcY < sy || (calcY === sy && calcM < sm)) return false; 
+            }
+            if(u.end_year && u.end_month) {
+                let ey = parseInt(u.end_year), em = parseInt(u.end_month);
+                if(calcY > ey || (calcY === ey && calcM >= em)) return false; 
+            }
+            if (u.status === 'Inactive' && !(u.end_year && u.end_month)) {
+               return false;
+            }
+            return true;
+        }
+
         async function refreshScoreDropdown() {
             let m = document.getElementById('score-month').value;
             let y = document.getElementById('score-year').value;
@@ -474,11 +489,17 @@
 
         function filterUsersByGroup() {
             let g = document.getElementById('score-group-filter').value;
+            let m = document.getElementById('score-month').value;
+            let y = document.getElementById('score-year').value;
             
             let available = cachedUsers.filter(u => {
                 let alreadyScored = currentScoredUsers.includes(String(u.user_id));
                 let isEditingThisUser = (String(u.user_id) === String(currentlyEditingUserId));
-                return (!alreadyScored || isEditingThisUser); // ไม่เอาคนที่กรอกแล้ว ยกเว้นคนที่กำลังแก้
+                
+                // กรองเฉพาะคนที่อยู่ในช่วงระยะเวลาการทำงาน (และ Active) เท่านั้น
+                let isActive = isUserActiveInPeriod(u, m, y);
+
+                return isActive && (!alreadyScored || isEditingThisUser);
             });
 
             if(g !== "ALL") available = available.filter(u => u.group_name === g);
@@ -508,6 +529,14 @@
             document.getElementById('form-reason').classList.toggle('hidden', isP4P);
         }
 
+        function resetScoreForm() {
+            document.getElementById('score-status').value = 'ได้รับ P4P';
+            document.getElementById('raw-score-input').value = '';
+            document.getElementById('reason-input').value = 'ทำงานไม่ครบ 15 วัน';
+            if(tomSelectInstance) tomSelectInstance.clear();
+            toggleScoreForm();
+        }
+
         async function submitScore() {
             let payload = {
                 user_id: document.getElementById('score-user').value, 
@@ -522,7 +551,7 @@
             let res = await apiCall('saveScore', payload);
             if(res.status === 'success') { 
                 Swal.fire('สำเร็จ', res.message, 'success'); 
-                document.getElementById('raw-score-input').value = ''; 
+                resetScoreForm();
                 currentlyEditingUserId = null; 
                 await refreshScoreDropdown(); 
             } else {
@@ -563,7 +592,7 @@
             document.getElementById('score-year').value = y;
             document.getElementById('score-status').value = status;
             document.getElementById('raw-score-input').value = score || '';
-            document.getElementById('reason-input').value = reason || '';
+            document.getElementById('reason-input').value = reason || 'ทำงานไม่ครบ 15 วัน';
             
             currentlyEditingUserId = uid; 
             toggleScoreForm();
@@ -601,22 +630,25 @@
             else Swal.fire('ผิดพลาด',res.message,'error');
         }
 
-        // === 5. จัดการบุคลากร (CRUD) ===
+        // === 5. จัดการบุคลากร (CRUD & Deactivate) ===
         function renderUserTable() { 
-            document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => `
-                <tr class="border-b hover:bg-gray-50 text-xs md:text-sm">
+            document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => {
+                let statusBadge = (u.status === 'Inactive') ? '<span class="px-2 py-1 rounded bg-red-100 text-red-800 text-xs">ระงับสิทธิ์</span>' : '<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs">ใช้งาน</span>';
+                
+                return `
+                <tr class="border-b hover:bg-gray-50 text-xs md:text-sm ${u.status === 'Inactive' ? 'opacity-60' : ''}">
                     <td class="px-4 py-3"><span class="font-bold text-gray-700">${u.user_id}</span><br><span class="text-gray-400">${u.username}</span></td>
                     <td class="px-4 py-3 font-medium text-blue-800">${u.name}</td>
                     <td class="px-4 py-3 text-gray-600">${u.group_name}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 rounded bg-gray-100">${u.role||'User'}</span></td>
+                    <td class="px-4 py-3 text-center">${statusBadge}</td>
                     <td class="px-4 py-3 text-green-600">${u.start_year ? u.start_month+'/'+u.start_year : '-'}</td>
                     <td class="px-4 py-3 text-red-500">${u.end_year ? u.end_month+'/'+u.end_year : '-'}</td>
                     <td class="px-4 py-3 text-center whitespace-nowrap">
-                        <button onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 bg-blue-50 p-2 rounded-lg mx-0.5 hover:bg-blue-100 border border-blue-200"><i class="fas fa-edit"></i></button>
-                        <button onclick='deleteUser("${u.user_id}")' class="text-red-600 bg-red-50 p-2 rounded-lg mx-0.5 hover:bg-red-100 border border-red-200"><i class="fas fa-trash"></i></button>
+                        <button onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 bg-blue-50 p-2 rounded-lg mx-0.5 hover:bg-blue-100 border border-blue-200" title="แก้ไข"><i class="fas fa-edit"></i></button>
+                        ${u.status !== 'Inactive' ? `<button onclick='deactivateUser("${u.user_id}")' class="text-orange-600 bg-orange-50 p-2 rounded-lg mx-0.5 hover:bg-orange-100 border border-orange-200" title="ระงับสิทธิ์"><i class="fas fa-user-slash"></i></button>` : ''}
                     </td>
                 </tr>
-            `).join(''); 
+            `}).join(''); 
         }
 
         function openUserModal(user=null) { 
@@ -626,6 +658,7 @@
                 document.getElementById('m-user').value=user.username; document.getElementById('m-pass').value=user.password;
                 document.getElementById('m-name').value=user.name; document.getElementById('m-group').value=user.group_name;
                 document.getElementById('m-guarantee').value=user.guarantee_score; document.getElementById('m-role').value=user.role;
+                document.getElementById('m-status').value = user.status || 'Active'; // ดึงสถานะเดิม
                 document.getElementById('m-s-m').value=user.start_month; document.getElementById('m-s-y').value=user.start_year;
                 document.getElementById('m-e-m').value=user.end_month; document.getElementById('m-e-y').value=user.end_year;
                 document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-edit mr-2'></i>แก้ไขข้อมูล"; 
@@ -633,6 +666,7 @@
                 ['m-id','m-user','m-pass','m-name','m-group','m-s-m','m-e-m','m-e-y'].forEach(id=>document.getElementById(id).value=''); 
                 document.getElementById('m-id').readOnly=false; document.getElementById('m-id').classList.remove('bg-gray-100');
                 document.getElementById('m-s-y').value='2567'; document.getElementById('m-guarantee').value='600'; document.getElementById('m-role').value='User';
+                document.getElementById('m-status').value = 'Active';
                 document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-plus mr-2'></i>เพิ่มบุคลากร"; 
             } 
         }
@@ -644,9 +678,9 @@
                 user_id: document.getElementById('m-id').value, username: document.getElementById('m-user').value, 
                 password: document.getElementById('m-pass').value, name: document.getElementById('m-name').value, 
                 group_name: document.getElementById('m-group').value, guarantee_score: document.getElementById('m-guarantee').value, 
-                role: document.getElementById('m-role').value, start_month: document.getElementById('m-s-m').value, 
-                start_year: document.getElementById('m-s-y').value, end_month: document.getElementById('m-e-m').value, 
-                end_year: document.getElementById('m-e-y').value 
+                role: document.getElementById('m-role').value, status: document.getElementById('m-status').value,
+                start_month: document.getElementById('m-s-m').value, start_year: document.getElementById('m-s-y').value, 
+                end_month: document.getElementById('m-e-m').value, end_year: document.getElementById('m-e-y').value 
             }; 
             if(!payload.user_id || !payload.name) return Swal.fire('แจ้งเตือน', 'รหัสและชื่อห้ามว่าง', 'warning'); 
             let res = await apiCall('saveUser', payload); 
@@ -654,10 +688,11 @@
             else Swal.fire('ผิดพลาด',res.message,'error');
         }
 
-        async function deleteUser(id) { 
-            if(confirm("ยืนยันการลบรหัส "+id+" หรือไม่?")) { 
-                let res = await apiCall('deleteUser', {user_id:id}); 
-                if(res.status==='success') { Swal.fire('ลบสำเร็จ',res.message,'success'); loadUsers(); } 
+        async function deactivateUser(id) { 
+            if(confirm("ยืนยันการระงับสิทธิ์ รหัส "+id+" หรือไม่? (ข้อมูลการคำนวณย้อนหลังจะยังคงอยู่)")) { 
+                let res = await apiCall('deactivateUser', {user_id:id}); 
+                if(res.status==='success') { Swal.fire('ระงับสิทธิ์สำเร็จ',res.message,'success'); loadUsers(); } 
+                else Swal.fire('ผิดพลาด',res.message,'error');
             } 
         }
 
@@ -738,6 +773,7 @@
             
             if(pageId === 'budget') loadBudgets();
             if(pageId === 'score-summary') loadScoreSummary();
+            if(pageId === 'scoring') refreshScoreDropdown();
             if(window.innerWidth < 768) toggleSidebar();
         }
 
