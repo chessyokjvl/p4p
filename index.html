@@ -105,6 +105,97 @@
                 </div>
             </div>
 
+            <div id="page-scoring" class="page max-w-3xl mx-auto">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg"><p class="text-sm text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>คำแนะนำ:</strong> รายชื่อบุคลากรที่บันทึกคะแนนไปแล้ว หรืออยู่นอกระยะเวลาทำงาน จะถูกซ่อนอัตโนมัติ</p></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div><label class="block text-sm font-semibold text-gray-700 mb-2">เดือนที่ประเมิน</label><select id="score-month" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" onchange="refreshScoreDropdown()"><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option><option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option><option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option></select></div>
+                        <div><label class="block text-sm font-semibold text-gray-700 mb-2">ปี (พ.ศ.)</label><input type="number" id="score-year" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" value="2567" onchange="refreshScoreDropdown()"></div>
+                    </div>
+                    <div id="group-filter-container" class="mb-6 hidden"><label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fas fa-filter text-gray-400 mr-1"></i> กรองรายชื่อตามกลุ่ม</label><select id="score-group-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border" onchange="filterUsersByGroup()"><option value="ALL">-- แสดงทุกกลุ่ม --</option></select></div>
+                    <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">ค้นหาบุคลากร</label><select id="score-user" class="w-full" placeholder="พิมพ์ชื่อเพื่อค้นหา..."></select></div>
+                    <div class="mb-6"><label class="block text-sm font-semibold text-gray-700 mb-2">สถานะการรับ P4P</label><select id="score-status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2.5 border font-medium" onchange="toggleScoreForm()"><option value="ได้รับ P4P" class="text-green-600">✅ ได้รับ P4P</option><option value="ไม่ได้รับ P4P" class="text-red-600">❌ ไม่ได้รับ P4P</option></select></div>
+                    <div id="form-raw-score" class="mb-8 p-4 bg-blue-50/50 rounded-xl border border-blue-100"><label class="block text-sm font-bold text-blue-900 mb-2">คะแนนดิบรวม</label><input type="number" id="raw-score-input" class="w-full border-blue-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-3.5 border bg-white text-xl font-bold text-blue-800" placeholder="ระบุตัวเลข"></div>
+                    <div id="form-reason" class="mb-8 hidden p-4 bg-red-50/50 rounded-xl border border-red-100"><label class="block text-sm font-bold text-red-900 mb-2">เหตุผลที่ไม่ได้</label><select id="reason-input" class="w-full border-red-300 rounded-xl shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 p-3.5 border bg-white text-gray-800"><option value="ทำงานไม่ครบ 15 วัน">ทำงานไม่ครบ 15 วัน</option><option value="ไม่ส่งคะแนน">ไม่ส่งคะแนน</option><option value="เรียน PG">เรียน PG</option><option value="ลาศึกษาต่อ">ลาศึกษาต่อ</option><option value="ลาคลอด">ลาคลอด</option><option value="ยังไม่เริ่มปฏิบัติงาน">ยังไม่เริ่มปฏิบัติงาน</option><option value="ออกจากงานไปแล้ว">ออกจากงานไปแล้ว</option><option value="อื่นๆ">อื่นๆ</option></select></div>
+                    <button onclick="submitScore()" class="w-full bg-navy-900 text-gold-500 border border-gold-500/30 font-bold py-4 rounded-xl hover:bg-navy-800 shadow-lg text-lg"><i class="fas fa-save mr-2"></i> บันทึกข้อมูลคะแนน</button>
+                </div>
+            </div>
+
+            <div id="page-score-summary" class="page hidden max-w-5xl mx-auto">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-navy-900"><i class="fas fa-list-check text-blue-500 mr-2"></i> ตรวจสอบผู้ที่บันทึกคะแนนแล้ว</h2>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex-1 flex items-center"><label class="mr-3 font-bold text-gray-700">เดือน:</label><select id="summary-month" class="border-gray-300 rounded-lg p-2 flex-1"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select></div>
+                        <div class="flex-1 flex items-center"><label class="mr-3 font-bold text-gray-700">ปี พ.ศ.:</label><input type="number" id="summary-year" class="border-gray-300 rounded-lg p-2 flex-1" value="2567"></div>
+                        <button onclick="loadScoreSummary()" class="bg-navy-800 text-white px-6 py-2 rounded-lg hover:bg-navy-900 shadow font-medium"><i class="fas fa-search mr-2"></i> ดึงข้อมูล</button>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-100 border-b"><tr><th class="px-5 py-4 text-left font-bold text-gray-700">ชื่อ-สกุล</th><th class="px-5 py-4 text-left font-bold text-gray-700">กลุ่มงาน</th><th class="px-5 py-4 text-center font-bold text-gray-700">สถานะ</th><th class="px-5 py-4 text-right font-bold text-gray-700">คะแนนดิบ</th><th class="px-5 py-4 text-left font-bold text-gray-700">เหตุผล</th><th class="px-5 py-4 text-center font-bold text-gray-700">จัดการ</th></tr></thead>
+                            <tbody id="score-summary-tbody" class="divide-y divide-gray-200 bg-white"><tr><td colspan="6" class="text-center py-10 text-gray-400">ระบุเดือนและปี แล้วกดปุ่ม "ดึงข้อมูล"</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-budget" class="page hidden max-w-4xl mx-auto space-y-6">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-xl font-bold mb-6 pb-2 border-b text-navy-900"><i class="fas fa-coins text-gold-500 mr-2"></i> กำหนดงบประมาณรวมประจำเดือน</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div><label class="block text-sm font-bold text-gray-700 mb-2">เดือน</label><select id="budget-month" class="w-full border-gray-300 rounded-xl p-3 border bg-gray-50"><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option><option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option><option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option></select></div>
+                        <div><label class="block text-sm font-bold text-gray-700 mb-2">ปี (พ.ศ.)</label><input type="number" id="budget-year" class="w-full border-gray-300 rounded-xl p-3 border bg-gray-50" value="2567"></div>
+                    </div>
+                    <div class="mb-8"><label class="block text-sm font-bold text-gray-700 mb-2">จำนวนเงินงบประมาณ (บาท)</label><input type="number" id="budget-amount" class="w-full border-gold-500/50 rounded-xl p-4 border bg-yellow-50 text-yellow-900 font-bold text-2xl" placeholder="ระบุตัวเลข"></div>
+                    <button onclick="submitBudget()" class="bg-navy-900 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-navy-800 shadow-lg w-full flex items-center justify-center border border-gold-500/30"><i class="fas fa-save mr-2 text-gold-500"></i> บันทึกงบประมาณ</button>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-bold mb-4 pb-2 border-b text-gray-700"><i class="fas fa-history text-gray-400 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
+                        <table class="min-w-full text-sm"><thead class="bg-gray-50 border-b"><tr><th class="px-5 py-4 text-left font-bold text-gray-600">เดือน / ปี (พ.ศ.)</th><th class="px-5 py-4 text-right font-bold text-gray-600">จำนวนเงิน (บาท)</th><th class="px-5 py-4 text-center font-bold text-gray-600 w-32">จัดการ</th></tr></thead><tbody id="budget-tbody" class="divide-y divide-gray-200 bg-white"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-personnel" class="page hidden">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h2 class="text-xl font-bold text-navy-900"><i class="fas fa-users-cog text-blue-500 mr-2"></i> ฐานข้อมูลบุคลากร</h2>
+                        <button onclick="openUserModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 font-medium"><i class="fas fa-user-plus mr-2 text-gold-500"></i> เพิ่มบุคลากร</button>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                        <table class="min-w-full text-sm"><thead class="bg-gray-100 border-b"><tr><th class="px-5 py-4 text-left font-bold text-gray-700">รหัส / ยูสเซอร์</th><th class="px-5 py-4 text-left font-bold text-gray-700">ชื่อ-สกุล</th><th class="px-5 py-4 text-left font-bold text-gray-700">กลุ่มงาน</th><th class="px-5 py-4 text-center font-bold text-gray-700">สถานะ</th><th class="px-5 py-4 text-left font-bold text-gray-700">เริ่มงาน</th><th class="px-5 py-4 text-left font-bold text-gray-700">ออกงาน</th><th class="px-5 py-4 text-center font-bold text-gray-700 w-32">จัดการ</th></tr></thead><tbody id="personnel-tbody" class="divide-y divide-gray-200 bg-white"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden">
+                    <div class="p-5 border-b flex justify-between items-center bg-navy-900 text-white"><h3 class="text-lg font-bold" id="user-modal-title">ข้อมูลบุคลากร</h3><button onclick="closeUserModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button></div>
+                    <div class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-5 bg-gray-50">
+                        <input type="hidden" id="modal-mode">
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">รหัสพนักงาน (ID)</label><input type="text" id="m-id" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none focus:border-blue-500"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Username</label><input type="text" id="m-user" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none focus:border-blue-500"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Password</label><input type="text" id="m-pass" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none focus:border-blue-500"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">ชื่อ-สกุล</label><input type="text" id="m-name" class="w-full border-0 border-b border-gray-300 p-1 text-sm font-bold text-blue-900 outline-none focus:border-blue-500"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">กลุ่มงาน</label><input type="text" id="m-group" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none focus:border-blue-500"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">แต้มประกัน</label><input type="number" id="m-guarantee" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none focus:border-blue-500 text-right font-bold text-indigo-600" value="600"></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">สิทธิ์ (Role)</label><select id="m-role" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none"><option value="User">User</option><option value="Admin">Admin</option></select></div>
+                        <div class="bg-white p-3 rounded-lg border shadow-sm"><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">สถานะระบบ</label><select id="m-status" class="w-full border-0 border-b border-gray-300 p-1 text-sm outline-none font-bold"><option value="Active" class="text-green-600">Active (ใช้งาน)</option><option value="Inactive" class="text-red-600">Inactive (ระงับสิทธิ์)</option></select></div>
+                        <div class="sm:col-span-2 mt-2">
+                            <div class="bg-white border rounded-xl p-4 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                <p class="text-sm font-bold text-navy-900 mb-3"><i class="fas fa-calendar-check mr-2 text-blue-500"></i> รอบการปฏิบัติงาน (ตัดอัตรากำลังอัตโนมัติ)</p>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><p class="text-xs font-bold text-gray-400 mb-1.5">เริ่มงาน</p><div class="flex gap-2"><input type="number" id="m-s-m" class="w-full border rounded p-1.5 text-sm bg-gray-50 text-center" placeholder="เดือน"><span class="pt-1">/</span><input type="number" id="m-s-y" class="w-full border rounded p-1.5 text-sm bg-gray-50 text-center" placeholder="ปี 2567"></div></div>
+                                    <div><p class="text-xs font-bold text-red-400 mb-1.5">สิ้นสุดการทำงาน (ลาออก)</p><div class="flex gap-2"><input type="number" id="m-e-m" class="w-full border border-red-200 rounded p-1.5 text-sm bg-red-50 text-center" placeholder="เดือน"><span class="pt-1">/</span><input type="number" id="m-e-y" class="w-full border border-red-200 rounded p-1.5 text-sm bg-red-50 text-center" placeholder="ปี พ.ศ."></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 border-t bg-white flex justify-end gap-3"><button onclick="closeUserModal()" class="px-6 py-2.5 rounded-lg text-gray-500 hover:bg-gray-100 font-bold">ยกเลิก</button><button onclick="submitUser()" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md font-bold"><i class="fas fa-save mr-2"></i> บันทึกข้อมูล</button></div>
+                </div>
+            </div>
+
             <div id="calc-controls" class="admin-only hidden bg-white border border-gray-200 p-5 rounded-2xl shadow-sm mb-6 no-print">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex items-center flex-wrap gap-3">
@@ -112,7 +203,7 @@
                         <span class="font-bold text-navy-900 mr-1">เลือกรอบบิล:</span>
                         <select id="calc-month" class="border-gray-300 rounded-lg p-2.5 text-sm shadow-sm bg-gray-50"><option value="10">ต.ค.</option><option value="11">พ.ย.</option><option value="12">ธ.ค.</option><option value="01">ม.ค.</option><option value="02">ก.พ.</option><option value="03">มี.ค.</option><option value="04">เม.ย.</option><option value="05">พ.ค.</option><option value="06">มิ.ย.</option><option value="07">ก.ค.</option><option value="08">ส.ค.</option><option value="09">ก.ย.</option></select>
                         <input type="number" id="calc-year" class="border-gray-300 rounded-lg p-2.5 text-sm w-24 shadow-sm bg-gray-50" value="2567">
-                        <button onclick="runCalculation()" class="bg-navy-900 text-white px-6 py-2.5 rounded-lg hover:bg-navy-800 shadow-lg transition-colors font-bold border border-gold-500/30 ml-2"><i class="fas fa-bolt mr-2 text-gold-500"></i> ประมวลผล P4P</button>
+                        <button onclick="runCalculation()" class="bg-navy-900 text-white px-6 py-2.5 rounded-lg hover:bg-navy-800 shadow-lg font-bold border border-gold-500/30 ml-2"><i class="fas fa-bolt mr-2 text-gold-500"></i> ประมวลผล P4P</button>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="exportCurrentTableToCSV()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 shadow-sm font-bold flex items-center"><i class="fas fa-file-excel mr-2"></i> Export Excel (CSV)</button>
@@ -126,22 +217,8 @@
                     <h2 class="text-xl font-bold mb-6 text-navy-900 print:text-center border-b pb-3"><i class="fas fa-search-dollar mr-2 text-purple-500"></i> ตารางตรวจสอบการปัดเศษ และกระจายเงินก้อนกลุ่ม (90/10)</h2>
                     <div class="overflow-x-auto border rounded-lg">
                         <table id="table-calculation" class="min-w-full text-xs md:text-sm whitespace-nowrap">
-                            <thead class="bg-yellow-100 border-b border-yellow-200">
-                                <tr>
-                                    <th class="px-3 py-3 text-left border-r font-bold text-gray-700">กลุ่ม</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">สัดส่วน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">ยอดคน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">สัดส่วน x ยอดคน</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-blue-900 bg-blue-50">เงินก้อนกลุ่ม</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">90%</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-gray-700">10%</th>
-                                    <th class="px-3 py-3 text-right border-r font-bold text-green-900 bg-green-50">รวมจ่ายจริง</th>
-                                    <th class="px-3 py-3 text-right font-bold text-gray-700">Check (=0)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summary-tbody" class="divide-y divide-gray-200">
-                                <tr><td colspan="9" class="text-center py-12 text-gray-400 italic">ระบุเดือน/ปี ด้านบน แล้วกดปุ่ม "ประมวลผล P4P"</td></tr>
-                            </tbody>
+                            <thead class="bg-yellow-100 border-b border-yellow-200"><tr><th class="px-3 py-3 text-left border-r font-bold text-gray-700">กลุ่ม</th><th class="px-3 py-3 text-right border-r font-bold text-gray-700">สัดส่วน</th><th class="px-3 py-3 text-right border-r font-bold text-gray-700">ยอดคน</th><th class="px-3 py-3 text-right border-r font-bold text-gray-700">สัดส่วน x ยอดคน</th><th class="px-3 py-3 text-right border-r font-bold text-blue-900 bg-blue-50">เงินก้อนกลุ่ม</th><th class="px-3 py-3 text-right border-r font-bold text-gray-700">90%</th><th class="px-3 py-3 text-right border-r font-bold text-gray-700">10%</th><th class="px-3 py-3 text-right border-r font-bold text-green-900 bg-green-50">รวมจ่ายจริง</th><th class="px-3 py-3 text-right font-bold text-gray-700">Check (=0)</th></tr></thead>
+                            <tbody id="summary-tbody" class="divide-y divide-gray-200"><tr><td colspan="9" class="text-center py-12 text-gray-400 italic">ระบุเดือน/ปี ด้านบน แล้วกดปุ่ม "ประมวลผล P4P"</td></tr></tbody>
                             <tfoot id="summary-tfoot" class="bg-gray-100 border-t-2 border-gray-300 hidden"></tfoot>
                         </table>
                     </div>
@@ -155,23 +232,10 @@
                         <h3 class="text-lg text-gray-600 font-medium" id="ind-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
                     </div>
                     <table id="table-report-ind" class="min-w-full text-sm border-2 border-gray-900">
-                        <thead class="border-b-2 border-gray-900 bg-gray-50">
-                            <tr>
-                                <th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th>
-                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">ชื่อ - สกุล</th>
-                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่ม</th>
-                                <th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทน (บาท)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-ind-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800">
-                            <tr><td colspan="4" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr>
-                        </tbody>
+                        <thead class="border-b-2 border-gray-900 bg-gray-50"><tr><th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th><th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">ชื่อ - สกุล</th><th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่ม</th><th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทน (บาท)</th></tr></thead>
+                        <tbody id="report-ind-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800"><tr><td colspan="4" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr></tbody>
                     </table>
-                    <div class="mt-12 text-right text-sm">
-                        <p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p>
-                        <p class="mb-2">(..............................................................)</p>
-                        <p>ตำแหน่ง..............................................................</p>
-                    </div>
+                    <div class="mt-12 text-right text-sm"><p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p><p class="mb-2">(..............................................................)</p><p>ตำแหน่ง..............................................................</p></div>
                 </div>
             </div>
 
@@ -182,28 +246,11 @@
                         <h3 class="text-lg text-gray-600 font-medium" id="group-report-date">ประจำเดือน ............ พ.ศ. ............</h3>
                     </div>
                     <table id="table-report-group" class="min-w-full text-sm border-2 border-gray-900">
-                        <thead class="border-b-2 border-gray-900 bg-gray-50">
-                            <tr>
-                                <th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th>
-                                <th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่ม</th>
-                                <th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทนรวม (บาท)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-group-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800">
-                            <tr><td colspan="3" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr>
-                        </tbody>
-                        <tfoot class="bg-gray-100 text-base">
-                            <tr>
-                                <td colspan="2" class="px-5 py-4 text-center border-r-2 border-gray-900 font-bold text-gray-900">รวมทั้งหมด</td>
-                                <td class="px-5 py-4 text-right font-bold text-green-700 text-lg border-t-2 border-gray-900 border-double" id="group-report-total">0.00</td>
-                            </tr>
-                        </tfoot>
+                        <thead class="border-b-2 border-gray-900 bg-gray-50"><tr><th class="px-5 py-3 text-center border-r-2 border-gray-900 w-20 font-bold text-gray-800">ลำดับ</th><th class="px-5 py-3 text-left border-r-2 border-gray-900 font-bold text-gray-800">กลุ่ม</th><th class="px-5 py-3 text-right font-bold text-gray-800 w-48">ค่าตอบแทนรวม (บาท)</th></tr></thead>
+                        <tbody id="report-group-tbody" class="divide-y border-b-2 border-gray-900 text-gray-800"><tr><td colspan="3" class="text-center py-10 italic">กรุณากดประมวลผล</td></tr></tbody>
+                        <tfoot class="bg-gray-100 text-base"><tr><td colspan="2" class="px-5 py-4 text-center border-r-2 border-gray-900 font-bold text-gray-900">รวมทั้งหมด</td><td class="px-5 py-4 text-right font-bold text-green-700 text-lg border-t-2 border-gray-900 border-double" id="group-report-total">0.00</td></tr></tfoot>
                     </table>
-                    <div class="mt-12 text-right text-sm">
-                        <p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p>
-                        <p class="mb-2">(..............................................................)</p>
-                        <p>ตำแหน่ง..............................................................</p>
-                    </div>
+                    <div class="mt-12 text-right text-sm"><p class="mb-8">ลงชื่อ..............................................................ผู้ตรวจสอบ</p><p class="mb-2">(..............................................................)</p><p>ตำแหน่ง..............................................................</p></div>
                 </div>
             </div>
 
@@ -214,13 +261,189 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
-        
-        let currentUser = null, cachedUsers = [];
-        let currentActivePage = 'scoring';
+        let currentUser = null, cachedUsers = [], currentScoredUsers = [], currentlyEditingUserId = null, tomSelectInstance = null, dashboardChart = null, currentActivePage = 'scoring';
         const mNames = {"10":"ตุลาคม","11":"พฤศจิกายน","12":"ธันวาคม","01":"มกราคม","02":"กุมภาพันธ์","03":"มีนาคม","04":"เมษายน","05":"พฤษภาคม","06":"มิถุนายน","07":"กรกฎาคม","08":"สิงหาคม","09":"กันยายน"};
 
-        // [ส่วนฟังก์ชันพื้นฐาน Login, Dashboard, LoadUsers, etc. ขอใช้จากเวอร์ชันที่แล้วได้เลยครับ]
-        
+        document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
+
+        async function apiCall(action, payload) {
+            Swal.showLoading();
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, payload }) });
+                Swal.close(); return await res.json();
+            } catch (error) {
+                Swal.close(); console.error(error); return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้" };
+            }
+        }
+
+        async function login() {
+            let u = document.getElementById('username').value, p = document.getElementById('password').value;
+            if(!u || !p) return Swal.fire('แจ้ง', 'กรุณากรอกให้ครบ', 'warning');
+            let data = await apiCall('login', { username: u, password: p });
+            if(data.status === 'success') {
+                currentUser = data.user;
+                document.getElementById('display-name').innerText = currentUser.name;
+                document.getElementById('user-role-badge').innerText = currentUser.role || 'User';
+                
+                let isAdmin = String(currentUser.role||'').trim().toLowerCase() === 'admin';
+                document.querySelectorAll('.admin-only').forEach(el => isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden'));
+                if(isAdmin) document.getElementById('group-filter-container').classList.remove('hidden');
+
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('sidebar').classList.remove('hidden');
+                
+                if(isAdmin) { switchPage('dashboard'); } else { switchPage('scoring'); }
+                await loadUsers();
+            } else Swal.fire('ผิดพลาด', data.message, 'error');
+        }
+
+        // === Dashboard ===
+        async function loadDashboard() {
+            let m = document.getElementById('dash-month').value, y = document.getElementById('dash-year').value;
+            let res = await apiCall('getDashboard', { month: m, year: y });
+            if(res.status === 'success') {
+                let d = res.data;
+                document.getElementById('dash-budget').innerText = d.budget.toLocaleString();
+                document.getElementById('dash-entered').innerText = d.enteredCount;
+                document.getElementById('dash-total').innerText = d.totalActive;
+                document.getElementById('dash-percent').innerText = d.percentComplete + '%';
+                document.getElementById('dash-received').innerText = d.receivedP4P;
+                document.getElementById('dash-not-received').innerText = d.notReceivedP4P;
+                
+                document.getElementById('dash-new-hires').innerHTML = d.newHires.length > 0 ? d.newHires.map(u => `<li><i class="fas fa-check-circle text-green-500 mr-2"></i> ${u.name} <span class="text-xs text-gray-400">(${u.group})</span></li>`).join('') : '<li class="italic text-gray-400">ไม่มีบุคลากรเข้าใหม่</li>';
+                document.getElementById('dash-resigned').innerHTML = d.resigned.length > 0 ? d.resigned.map(u => `<li><i class="fas fa-times-circle text-red-500 mr-2"></i> ${u.name} <span class="text-xs text-gray-400">(${u.group})</span></li>`).join('') : '<li class="italic text-gray-400">ไม่มีบุคลากรลาออก</li>';
+
+                if(dashboardChart) dashboardChart.destroy();
+                let ctx = document.getElementById('p4pChart').getContext('2d');
+                dashboardChart = new Chart(ctx, { type: 'bar', data: { labels: ['ได้รับ P4P', 'ไม่ได้รับ P4P', 'ยังไม่บันทึก'], datasets: [{ label: 'จำนวนคน', data: [d.receivedP4P, d.notReceivedP4P, (d.totalActive - d.enteredCount)], backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(203, 213, 225, 0.8)'], borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+            } else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        // === Loading Users ===
+        async function loadUsers() {
+            if(String(currentUser.role||'').trim().toLowerCase() !== 'admin') {
+                initTomSelect([{ user_id: currentUser.id, name: currentUser.name, group_name: currentUser.group }], true); return;
+            }
+            let data = await apiCall('getUsers', {});
+            if(data.status === 'success') {
+                cachedUsers = data.data.filter(u => u.user_id && u.name);
+                let groups = [...new Set(cachedUsers.map(u => u.group_name))];
+                document.getElementById('score-group-filter').innerHTML = `<option value="ALL">-- แสดงทุกกลุ่ม --</option>` + groups.map(g => `<option value="${g}">${g}</option>`).join('');
+                renderUserTable(); await refreshScoreDropdown();
+            }
+        }
+
+        function isUserActiveInPeriod(u, calcM, calcY) {
+            calcM = parseInt(calcM); calcY = parseInt(calcY);
+            if(u.start_year && u.start_month) { let sy = parseInt(u.start_year), sm = parseInt(u.start_month); if(calcY < sy || (calcY === sy && calcM < sm)) return false; }
+            if(u.end_year && u.end_month) { let ey = parseInt(u.end_year), em = parseInt(u.end_month); if(calcY > ey || (calcY === ey && calcM >= em)) return false; }
+            if (u.status === 'Inactive' && !(u.end_year && u.end_month)) return false;
+            return true;
+        }
+
+        async function refreshScoreDropdown() {
+            let m = document.getElementById('score-month').value, y = document.getElementById('score-year').value;
+            let res = await apiCall('getScores', { month: m, year: y });
+            currentScoredUsers = res.status === 'success' ? res.data.map(s => String(s.user_id)) : [];
+            filterUsersByGroup();
+        }
+
+        function filterUsersByGroup() {
+            let g = document.getElementById('score-group-filter').value, m = document.getElementById('score-month').value, y = document.getElementById('score-year').value;
+            let available = cachedUsers.filter(u => {
+                let alreadyScored = currentScoredUsers.includes(String(u.user_id));
+                let isEditingThisUser = (String(u.user_id) === String(currentlyEditingUserId));
+                let isActive = isUserActiveInPeriod(u, m, y);
+                return isActive && (!alreadyScored || isEditingThisUser);
+            });
+            if(g !== "ALL") available = available.filter(u => u.group_name === g);
+            initTomSelect(available);
+            if(currentlyEditingUserId && tomSelectInstance) tomSelectInstance.setValue(currentlyEditingUserId);
+        }
+
+        function initTomSelect(arr, lock = false) {
+            if(tomSelectInstance) tomSelectInstance.destroy();
+            let el = document.getElementById('score-user');
+            el.innerHTML = arr.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
+            tomSelectInstance = new TomSelect(el, { create: false, sortField: { field: "text", direction: "asc" }, placeholder: "คลิกเพื่อเลือก หรือ พิมพ์ชื่อ..." });
+            if(lock) tomSelectInstance.disable();
+        }
+
+        function toggleScoreForm() {
+            let isP4P = document.getElementById('score-status').value === 'ได้รับ P4P';
+            document.getElementById('form-raw-score').classList.toggle('hidden', !isP4P); document.getElementById('form-reason').classList.toggle('hidden', isP4P);
+        }
+
+        function resetScoreForm() {
+            document.getElementById('score-status').value = 'ได้รับ P4P'; document.getElementById('raw-score-input').value = ''; document.getElementById('reason-input').value = 'ทำงานไม่ครบ 15 วัน';
+            if(tomSelectInstance) tomSelectInstance.clear();
+            toggleScoreForm();
+        }
+
+        async function submitScore() {
+            let currentStatus = document.getElementById('score-status').value;
+            let finalScore = currentStatus === 'ได้รับ P4P' ? document.getElementById('raw-score-input').value : '';
+            let finalReason = currentStatus === 'ไม่ได้รับ P4P' ? document.getElementById('reason-input').value : '';
+            let payload = { user_id: document.getElementById('score-user').value, month: document.getElementById('score-month').value, year: document.getElementById('score-year').value, status: currentStatus, raw_score: finalScore, reason: finalReason };
+            
+            if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
+            if(currentStatus === 'ได้รับ P4P' && payload.raw_score === '') return Swal.fire('แจ้งเตือน', 'กรุณากรอกคะแนนดิบรวม', 'warning');
+
+            let res = await apiCall('saveScore', payload);
+            if(res.status === 'success') { Swal.fire('สำเร็จ', res.message, 'success'); resetScoreForm(); currentlyEditingUserId = null; await refreshScoreDropdown(); } 
+            else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        async function loadScoreSummary() {
+            let m = document.getElementById('summary-month').value, y = document.getElementById('summary-year').value;
+            let res = await apiCall('getScores', { month: m, year: y });
+            if(res.status === 'success') {
+                let html = res.data.map(s => {
+                    let user = cachedUsers.find(u => String(u.user_id) === String(s.user_id)) || { name: 'ไม่พบในระบบ', group_name: '-' };
+                    let statusClass = s.status === 'ได้รับ P4P' ? 'text-green-700 bg-green-100/50 px-2 py-1 rounded border border-green-200' : 'text-red-700 bg-red-100/50 px-2 py-1 rounded border border-red-200';
+                    return `
+                        <tr class="border-b hover:bg-blue-50 transition-colors">
+                            <td class="px-5 py-4 font-medium text-blue-900">${user.name}</td><td class="px-5 py-4 text-gray-600">${user.group_name}</td>
+                            <td class="px-5 py-4 text-center font-bold">${statusClass.includes('green') ? '<i class="fas fa-check-circle text-green-500 mr-1"></i>':'<i class="fas fa-times-circle text-red-500 mr-1"></i>'} <span class="${statusClass}">${s.status}</span></td>
+                            <td class="px-5 py-4 text-right font-bold text-gray-800 text-lg">${s.status === 'ได้รับ P4P' ? s.raw_score : '-'}</td>
+                            <td class="px-5 py-4 text-gray-500 text-sm">${s.reason || '-'}</td>
+                            <td class="px-5 py-4 text-center"><button onclick="editRecordedScore('${s.user_id}', '${s.status}', '${s.raw_score}', '${s.reason}', '${m}', '${y}')" class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 hover:text-blue-600 shadow-sm font-bold transition-all"><i class="fas fa-edit mr-1"></i> แก้ไข</button></td>
+                        </tr>
+                    `;
+                }).join('');
+                document.getElementById('score-summary-tbody').innerHTML = html || `<tr><td colspan="6" class="text-center py-10 text-red-500 bg-red-50"><i class="fas fa-box-open text-3xl mb-3 block text-red-300"></i> ไม่มีข้อมูลการบันทึกในเดือนที่เลือก</td></tr>`;
+            } else Swal.fire('ผิดพลาด', res.message, 'error');
+        }
+
+        function editRecordedScore(uid, status, score, reason, m, y) {
+            document.getElementById('score-month').value = m; document.getElementById('score-year').value = y; document.getElementById('score-status').value = status;
+            document.getElementById('raw-score-input').value = score || ''; document.getElementById('reason-input').value = reason || 'ทำงานไม่ครบ 15 วัน';
+            currentlyEditingUserId = uid; toggleScoreForm(); switchPage('scoring'); refreshScoreDropdown(); 
+        }
+
+        // === งบประมาณ & บุคลากร CRUD ===
+        async function loadBudgets() {
+            let data = await apiCall('getBudgets', {});
+            if(data.status === 'success') {
+                let budgets = data.data.filter(b => b.month && b.year).sort((a,b) => (b.year + b.month) - (a.year + a.month));
+                document.getElementById('budget-tbody').innerHTML = budgets.map(b => `<tr class="border-b hover:bg-gray-50"><td class="px-5 py-4 font-bold text-gray-700">${mNames[b.month]} ${b.year}</td><td class="px-5 py-4 text-right font-bold text-blue-700 text-lg">${parseFloat(b.total_amount).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td class="px-5 py-4 text-center"><button onclick="editBudget('${b.month}', '${b.year}', '${b.total_amount}')" class="text-navy-900 bg-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 shadow-sm font-bold">แก้ไข</button></td></tr>`).join('') || `<tr><td colspan="3" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลงบประมาณ</td></tr>`;
+            }
+        }
+        function editBudget(m, y, amt) { document.getElementById('budget-month').value=m; document.getElementById('budget-year').value=y; document.getElementById('budget-amount').value=amt; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function submitBudget() { let amt = document.getElementById('budget-amount').value; if(!amt) return Swal.fire('แจ้งเตือน','กรุณาระบุจำนวนเงิน','warning'); let res = await apiCall('saveBudget', {month:document.getElementById('budget-month').value, year:document.getElementById('budget-year').value, amount:amt}); if(res.status==='success') { Swal.fire('สำเร็จ',res.message,'success'); document.getElementById('budget-amount').value = ''; loadBudgets(); } }
+
+        function renderUserTable() { 
+            document.getElementById('personnel-tbody').innerHTML = cachedUsers.map(u => {
+                let statusBadge = (u.status === 'Inactive') ? '<span class="px-2 py-1 rounded bg-red-100 text-red-800 text-xs font-bold">ระงับสิทธิ์</span>' : '<span class="px-2 py-1 rounded bg-green-100 text-green-800 text-xs font-bold">Active</span>';
+                return `<tr class="border-b hover:bg-gray-50 text-xs md:text-sm ${u.status === 'Inactive' ? 'opacity-50' : ''}"><td class="px-5 py-3"><span class="font-bold text-navy-900">${u.user_id}</span><br><span class="text-gray-400">${u.username}</span></td><td class="px-5 py-3 font-bold text-blue-800">${u.name}</td><td class="px-5 py-3 text-gray-600">${u.group_name}</td><td class="px-5 py-3 text-center">${statusBadge}</td><td class="px-5 py-3 text-gray-600 font-medium">${u.start_year ? u.start_month+'/'+u.start_year : '-'}</td><td class="px-5 py-3 text-red-500 font-medium">${u.end_year ? u.end_month+'/'+u.end_year : '-'}</td><td class="px-5 py-3 text-center whitespace-nowrap"><button onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})' class="text-blue-600 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mx-0.5 hover:bg-blue-50" title="แก้ไข"><i class="fas fa-edit"></i></button>${u.status !== 'Inactive' ? `<button onclick='deactivateUser("${u.user_id}")' class="text-orange-500 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mx-0.5 hover:bg-orange-50" title="ระงับสิทธิ์"><i class="fas fa-user-slash"></i></button>` : ''}</td></tr>`}).join(''); 
+        }
+        function openUserModal(user=null) { document.getElementById('user-modal').classList.remove('hidden'); if(user) { document.getElementById('m-id').value=user.user_id; document.getElementById('m-id').readOnly=true; document.getElementById('m-id').classList.add('bg-gray-100'); document.getElementById('m-user').value=user.username; document.getElementById('m-pass').value=user.password; document.getElementById('m-name').value=user.name; document.getElementById('m-group').value=user.group_name; document.getElementById('m-guarantee').value=user.guarantee_score; document.getElementById('m-role').value=user.role; document.getElementById('m-status').value = user.status || 'Active'; document.getElementById('m-s-m').value=user.start_month; document.getElementById('m-s-y').value=user.start_year; document.getElementById('m-e-m').value=user.end_month; document.getElementById('m-e-y').value=user.end_year; document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-edit mr-2 text-blue-400'></i>แก้ไขข้อมูล"; } else { ['m-id','m-user','m-pass','m-name','m-group','m-s-m','m-e-m','m-e-y'].forEach(id=>document.getElementById(id).value=''); document.getElementById('m-id').readOnly=false; document.getElementById('m-id').classList.remove('bg-gray-100'); document.getElementById('m-s-y').value='2567'; document.getElementById('m-guarantee').value='600'; document.getElementById('m-role').value='User'; document.getElementById('m-status').value = 'Active'; document.getElementById('user-modal-title').innerHTML = "<i class='fas fa-user-plus mr-2 text-blue-400'></i>เพิ่มบุคลากร"; } }
+        function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+        async function submitUser() { let payload = { user_id: document.getElementById('m-id').value, username: document.getElementById('m-user').value, password: document.getElementById('m-pass').value, name: document.getElementById('m-name').value, group_name: document.getElementById('m-group').value, guarantee_score: document.getElementById('m-guarantee').value, role: document.getElementById('m-role').value, status: document.getElementById('m-status').value, start_month: document.getElementById('m-s-m').value, start_year: document.getElementById('m-s-y').value, end_month: document.getElementById('m-e-m').value, end_year: document.getElementById('m-e-y').value }; if(!payload.user_id || !payload.name) return Swal.fire('แจ้งเตือน', 'รหัสและชื่อห้ามว่าง', 'warning'); let res = await apiCall('saveUser', payload); if(res.status==='success') { closeUserModal(); Swal.fire('สำเร็จ',res.message,'success'); loadUsers(); } else Swal.fire('ผิดพลาด',res.message,'error'); }
+        async function deactivateUser(id) { if(confirm("ยืนยันการระงับสิทธิ์ รหัส "+id+" หรือไม่?")) { let res = await apiCall('deactivateUser', {user_id:id}); if(res.status==='success') { Swal.fire('ระงับสิทธิ์สำเร็จ',res.message,'success'); loadUsers(); } } }
+
+        // === 6. การประมวลผล (คำนวณและออกรายงาน) ===
         async function runCalculation() {
             let m = document.getElementById('calc-month').value, y = document.getElementById('calc-year').value;
             
@@ -231,10 +454,8 @@
 
             if(res.status === 'success') {
                 let dateStr = `ประจำเดือน ${mNames[m]} พ.ศ. ${y}`;
-                document.getElementById('ind-report-date').innerText = dateStr; 
-                document.getElementById('group-report-date').innerText = dateStr;
+                document.getElementById('ind-report-date').innerText = dateStr; document.getElementById('group-report-date').innerText = dateStr;
 
-                // 1. ตารางตรวจสอบ 90/10 พร้อมยอดรวม
                 let totalCount = 0, totalWCount = 0, totalMoney = 0, total90 = 0, total10 = 0, totalPay = 0;
                 
                 document.getElementById('summary-tbody').innerHTML = res.summary.map(s => {
@@ -254,7 +475,6 @@
                     </tr>
                 `}).join('');
 
-                // เติมผลรวมด้านล่างสุดของตารางคำนวณ
                 let tfoot = document.getElementById('summary-tfoot');
                 tfoot.classList.remove('hidden');
                 tfoot.innerHTML = `
@@ -270,7 +490,6 @@
                     </tr>
                 `;
 
-                // 2. ตารางรายบุคคล (แสดงคนได้ 0 ด้วย)
                 document.getElementById('report-ind-tbody').innerHTML = res.data.map((r, i) => `
                     <tr class="border-b border-gray-300 ${r.pay_num === 0 ? 'bg-red-50 text-red-800' : ''}">
                         <td class="px-5 py-3 text-center border-r-2 border-gray-900">${i+1}</td>
@@ -280,7 +499,6 @@
                     </tr>
                 `).join('');
 
-                // 3. ตารางกลุ่ม
                 let totalFin = 0; 
                 document.getElementById('report-group-tbody').innerHTML = res.finance.map((f, i) => { 
                     totalFin+=f.total; 
@@ -289,20 +507,17 @@
                 document.getElementById('group-report-total').innerText = totalFin.toLocaleString('en-US',{minimumFractionDigits:2});
                 
                 Swal.fire('ประมวลผลสำเร็จ', 'ไปที่เมนูรายงานทางการเงินเพื่อตรวจสอบ', 'success');
-            } else {
-                Swal.fire('ข้อผิดพลาด', res.message, 'error');
-            }
+            } else Swal.fire('ข้อผิดพลาด', res.message, 'error');
         }
 
-        // === Export To CSV (Excel รองรับ) ===
+        // === Export Excel (CSV) ===
         function exportCurrentTableToCSV() {
-            let tableId = '';
-            let filename = '';
+            let tableId = '', filename = '';
             
             if (currentActivePage === 'calculation') { tableId = 'table-calculation'; filename = 'P4P_Calculation_Check'; }
             else if (currentActivePage === 'report-ind') { tableId = 'table-report-ind'; filename = 'P4P_Individual_Report'; }
             else if (currentActivePage === 'report-group') { tableId = 'table-report-group'; filename = 'P4P_Group_Report'; }
-            else { return Swal.fire('แจ้งเตือน', 'หน้านี้ไม่รองรับการ Export', 'warning'); }
+            else return Swal.fire('แจ้งเตือน', 'หน้านี้ไม่รองรับการ Export', 'warning'); 
 
             let table = document.getElementById(tableId);
             let rows = table.querySelectorAll('tr');
@@ -317,7 +532,6 @@
                 csv.push(row.join(','));
             }
             
-            // ใช้ BOM สำหรับรองรับภาษาไทยใน MS Excel
             let csvFile = new Blob(["\uFEFF" + csv.join('\n')], {type: "text/csv;charset=utf-8;"});
             let downloadLink = document.createElement("a");
             downloadLink.download = filename + "_" + document.getElementById('calc-month').value + "_" + document.getElementById('calc-year').value + ".csv";
@@ -328,6 +542,7 @@
             document.body.removeChild(downloadLink);
         }
 
+        // === Navigation ===
         function switchPage(pageId) {
             currentActivePage = pageId;
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
@@ -350,6 +565,7 @@
             if(window.innerWidth < 768) toggleSidebar();
         }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-backdrop').classList.toggle('hidden'); }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
