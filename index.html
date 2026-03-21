@@ -149,9 +149,17 @@
                     <button onclick="submitBudget()" class="bg-navy-900 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-navy-800 shadow-lg w-full flex items-center justify-center border border-gold-500/30"><i class="fas fa-save mr-2 text-gold-500"></i> บันทึกงบประมาณ</button>
                 </div>
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-4 pb-2 border-b text-gray-700"><i class="fas fa-history text-gray-400 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                        <h2 class="text-lg font-bold text-gray-700"><i class="fas fa-history text-gray-400 mr-2"></i> ประวัติงบประมาณที่บันทึกไว้</h2>
+                        <button onclick="loadBudgets()" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-4 rounded-lg transition-colors font-bold border border-blue-200"><i class="fas fa-sync-alt mr-1"></i> โหลดข้อมูล</button>
+                    </div>
                     <div class="overflow-x-auto rounded-xl border border-gray-200">
-                        <table class="min-w-full text-sm"><thead class="bg-gray-50 border-b"><tr><th class="px-5 py-4 text-left font-bold text-gray-600">เดือน / ปี (พ.ศ.)</th><th class="px-5 py-4 text-right font-bold text-gray-600">จำนวนเงิน (บาท)</th><th class="px-5 py-4 text-center font-bold text-gray-600 w-32">จัดการ</th></tr></thead><tbody id="budget-tbody" class="divide-y divide-gray-200 bg-white"></tbody></table>
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50 border-b">
+                                <tr><th class="px-5 py-4 text-left font-bold text-gray-600">เดือน / ปี (พ.ศ.)</th><th class="px-5 py-4 text-right font-bold text-gray-600">จำนวนเงิน (บาท)</th><th class="px-5 py-4 text-center font-bold text-gray-600 w-32">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="budget-tbody" class="divide-y divide-gray-200 bg-white"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -553,15 +561,27 @@
                 el.classList.add('hover:bg-slate-800', 'text-gray-300'); 
             });
             
-            if (window.event && window.event.currentTarget.classList) { 
+            if (window.event && window.event.currentTarget && window.event.currentTarget.classList) { 
                 window.event.currentTarget.classList.add('bg-blue-600/20', 'text-white', 'border', 'border-blue-500/30'); 
                 window.event.currentTarget.classList.remove('hover:bg-slate-800', 'text-gray-300'); 
-                document.getElementById('topbar-title').innerText = window.event.currentTarget.innerText.trim(); 
+                if(window.event.currentTarget.innerText) {
+                    document.getElementById('topbar-title').innerText = window.event.currentTarget.innerText.trim(); 
+                }
             }
 
-            if(['calculation', 'report-ind', 'report-group'].includes(pageId)) document.getElementById('calc-controls').classList.remove('hidden'); 
-            else document.getElementById('calc-controls').classList.add('hidden');
+            if(['calculation', 'report-ind', 'report-group'].includes(pageId)) {
+                document.getElementById('calc-controls').classList.remove('hidden'); 
+            } else {
+                document.getElementById('calc-controls').classList.add('hidden');
+            }
             
+            // --- โค้ดส่วนที่สั่งโหลดข้อมูลอัตโนมัติเมื่อกดสลับหน้า ---
+            if(pageId === 'dashboard') loadDashboard();
+            if(pageId === 'budget') loadBudgets();
+            if(pageId === 'score-summary') loadScoreSummary();
+            if(pageId === 'scoring') refreshScoreDropdown();
+            // ---------------------------------------------------
+
             if(window.innerWidth < 768) toggleSidebar();
         }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-backdrop').classList.toggle('hidden'); }
