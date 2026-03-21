@@ -270,7 +270,7 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwUk1SaqV62XHRFJMXMFgRNuZxekGwrCgfZSH1lVn6yak-k4XIUHtDF2TMV_OFJzi5P/exec";
         let currentUser = null, cachedUsers = [], currentScoredUsers = [], currentlyEditingUserId = null, tomSelectInstance = null, dashboardChart = null, currentActivePage = 'scoring';
-        const mNames = {"10":"ตุลาคม","11":"พฤศจิกายน","12":"ธันวาคม","01":"มกราคม","02":"กุมภาพันธ์","03":"มีนาคม","04":"เมษายน","05":"พฤษภาคม","06":"มิถุนายน","07":"กรกฎาคม","08":"สิงหาคม","09":"กันยายน"};
+        const mNames = {"10":"ตุลาคม","11":"พฤศจิกายน","12":"ธันวาคม","01":"มกราคม","1":"มกราคม","02":"กุมภาพันธ์","2":"กุมภาพันธ์","03":"มีนาคม","3":"มีนาคม","04":"เมษายน","4":"เมษายน","05":"พฤษภาคม","5":"พฤษภาคม","06":"มิถุนายน","6":"มิถุนายน","07":"กรกฎาคม","7":"กรกฎาคม","08":"สิงหาคม","8":"สิงหาคม","09":"กันยายน","9":"กันยายน"};
 
         document.getElementById("password").addEventListener("keypress", e => { if (e.key === "Enter") login(); });
 
@@ -434,8 +434,25 @@
         async function loadBudgets() {
             let data = await apiCall('getBudgets', {});
             if(data.status === 'success') {
-                let budgets = data.data.filter(b => b.month && b.year).sort((a,b) => (b.year + b.month) - (a.year + a.month));
-                document.getElementById('budget-tbody').innerHTML = budgets.map(b => `<tr class="border-b hover:bg-gray-50"><td class="px-5 py-4 font-bold text-gray-700">${mNames[b.month]} ${b.year}</td><td class="px-5 py-4 text-right font-bold text-blue-700 text-lg">${parseFloat(b.total_amount).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td class="px-5 py-4 text-center"><button onclick="editBudget('${b.month}', '${b.year}', '${b.total_amount}')" class="text-navy-900 bg-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 shadow-sm font-bold">แก้ไข</button></td></tr>`).join('') || `<tr><td colspan="3" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลงบประมาณ</td></tr>`;
+                // บังคับเติม 0 ด้านหน้าเพื่อไม่ให้การเรียงลำดับเพี้ยน
+                let budgets = data.data.filter(b => b.month && b.year).sort((a,b) => {
+                    let aStr = String(a.year) + String(a.month).padStart(2, '0');
+                    let bStr = String(b.year) + String(b.month).padStart(2, '0');
+                    return Number(bStr) - Number(aStr);
+                });
+
+                document.getElementById('budget-tbody').innerHTML = budgets.map(b => {
+                    let mStr = String(b.month).padStart(2, '0');
+                    return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-5 py-4 font-bold text-gray-700">${mNames[mStr]} ${b.year}</td>
+                        <td class="px-5 py-4 text-right font-bold text-blue-700 text-lg">${parseFloat(b.total_amount).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+                        <td class="px-5 py-4 text-center">
+                            <button onclick="editBudget('${mStr}', '${b.year}', '${b.total_amount}')" class="text-navy-900 bg-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 shadow-sm font-bold">แก้ไข</button>
+                        </td>
+                    </tr>
+                    `;
+                }).join('') || `<tr><td colspan="3" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลงบประมาณ</td></tr>`;
             }
         }
         function editBudget(m, y, amt) { document.getElementById('budget-month').value=m; document.getElementById('budget-year').value=y; document.getElementById('budget-amount').value=amt; window.scrollTo({ top: 0, behavior: 'smooth' }); }
