@@ -390,17 +390,77 @@
         }
 
         async function submitScore() {
-            let currentStatus = document.getElementById('score-status').value;
-            let finalScore = currentStatus === 'ได้รับ P4P' ? document.getElementById('raw-score-input').value : '';
-            let finalReason = currentStatus === 'ไม่ได้รับ P4P' ? document.getElementById('reason-input').value : '';
-            let payload = { user_id: document.getElementById('score-user').value, month: document.getElementById('score-month').value, year: document.getElementById('score-year').value, status: currentStatus, raw_score: finalScore, reason: finalReason };
+            let payload = {
+                user_id: document.getElementById('score-user').value, 
+                month: document.getElementById('score-month').value,
+                year: document.getElementById('score-year').value, 
+                status: document.getElementById('score-status').value,
+                raw_score: document.getElementById('raw-score-input').value, 
+                reason: document.getElementById('reason-input').value
+            };
             
             if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
-            if(currentStatus === 'ได้รับ P4P' && payload.raw_score === '') return Swal.fire('แจ้งเตือน', 'กรุณากรอกคะแนนดิบรวม', 'warning');
+
+            // แสดง Loading เบาๆ
+            Swal.fire({
+                title: 'กำลังบันทึก...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
 
             let res = await apiCall('saveScore', payload);
-            if(res.status === 'success') { Swal.fire('สำเร็จ', res.message, 'success'); resetScoreForm(); currentlyEditingUserId = null; await refreshScoreDropdown(); } 
-            else Swal.fire('ผิดพลาด', res.message, 'error');
+            
+            if(res.status === 'success') { 
+                // 1. เปลี่ยนการแจ้งเตือนเป็นแบบ Toast (เด้งมุมขวาบน ไม่บล็อกหน้าจอ)
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'บันทึกคะแนนเรียบร้อย',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+                // 2. นำ ID ของคนที่เพิ่งบันทึก ใส่เข้าไปใน Array คนที่กรอกแล้ว (ไม่ต้องรอโหลดจาก Sheet ใหม่)
+                if (!currentScoredUsers.includes(String(payload.user_id))) {
+                    currentScoredUsers.push(String(payload.user_id));
+                }
+
+                // 3. ล้างค่าในฟอร์มให้กลับเป็นค่า Default
+                document.getElementById('score-status').value = 'ได้รับ P4P';
+                document.getElementById('raw-score-input').value = '';
+                document.getElementById('reason-input').value = 'ทำงานไม่ครบ 15 วัน';
+                toggleScoreForm();
+                currentlyEditingUserId = null; 
+                
+                // 4. อัปเดต Dropdown ใหม่ทันที (เร็วระดับเสี้ยววินาที)
+                filterUsersByGroup();
+                
+                // โฟกัสกลับไปที่ Dropdown เพื่อให้พร้อมกรอกคนต่อไปได้เลย
+                if(tomSelectInstance) {
+                    tomSelectInstance.clear();
+                    tomSelectInstance.focus();
+                }
+
+            } else {
+                Swal.fire('ผิดพลาด', res.message, 'error');
+            }
+        }
+        
+        // เราต้องไปลบ Swal.showLoading() และ Swal.close() ใน apiCall เดิมออกด้วย 
+        // เพื่อไม่ให้มันไปทับซ้อนกับ Loading ตัวใหม่ที่เนียนกว่า
+        // ให้หาฟังก์ชัน apiCall เดิม แล้วเปลี่ยนเป็นแบบนี้ครับ:
+        async function apiCall(action, payload) {
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action, payload }) 
+                });
+                return await res.json();
+            } catch (error) {
+                console.error("API Error:", error);
+                return { status: "error", message: "ไม่สามารถเชื่อมต่อระบบ API ได้ ตรวจสอบอินเทอร์เน็ตหรือ URL" };
+            }
         }
 
         async function loadScoreSummary() {
