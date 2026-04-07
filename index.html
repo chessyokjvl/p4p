@@ -410,14 +410,23 @@
         }
 
         async function submitScore() {
+            let currentStatus = document.getElementById('score-status').value;
+            let currentReason = document.getElementById('reason-input').value;
+            
+            // 💡 แก้บั๊กตรงนี้ครับ: ถ้าสถานะคือ "ได้รับ P4P" ให้บังคับล้างค่าเหตุผลทิ้งก่อนส่ง
+            if (currentStatus === 'ได้รับ P4P') {
+                currentReason = ''; 
+            }
+
             let payload = {
                 user_id: document.getElementById('score-user').value, 
                 month: document.getElementById('score-month').value,
                 year: document.getElementById('score-year').value, 
-                status: document.getElementById('score-status').value,
+                status: currentStatus,
                 raw_score: document.getElementById('raw-score-input').value, 
-                reason: document.getElementById('reason-input').value
+                reason: currentReason // ใช้ตัวแปรที่ถูกดักกรองแล้ว
             };
+            
             if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
 
             // --- หาคนถัดไปก่อนที่จะทำการบันทึกและลบคนนี้ออก ---
@@ -427,12 +436,14 @@
             
             let available = cachedUsers.filter(u => isUserActiveInPeriod(u, m, y) && !currentScoredUsers.includes(String(u.user_id)));
             if(g !== "ALL") available = available.filter(u => u.group_name === g);
+            
+            // เรียงลำดับตาม ID
             available.sort((a, b) => String(a.user_id).localeCompare(String(b.user_id), 'th', {numeric: true}));
             
             let currentIndex = available.findIndex(u => String(u.user_id) === String(payload.user_id));
             let nextUserId = null;
             if (currentIndex !== -1 && currentIndex + 1 < available.length) {
-                nextUserId = available[currentIndex + 1].user_id; // ได้ ID คนถัดไปเตรียมไว้แล้ว
+                nextUserId = available[currentIndex + 1].user_id; 
             }
             // --------------------------------------------------
 
@@ -457,7 +468,7 @@
                 // โหลดรายชื่อใหม่ พร้อมส่ง ID คนถัดไปให้มันเลือกอัตโนมัติ
                 filterUsersByGroup(nextUserId);
                 
-                // โฟกัสเคอร์เซอร์ไปที่ช่องกรอกคะแนนทันที!
+                // โฟกัสเคอร์เซอร์ไปที่ช่องกรอกคะแนนทันที
                 setTimeout(() => {
                     document.getElementById('raw-score-input').focus();
                 }, 100);
