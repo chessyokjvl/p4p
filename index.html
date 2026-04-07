@@ -357,24 +357,44 @@
             filterUsersByGroup();
         }
 
-        function filterUsersByGroup() {
-            let g = document.getElementById('score-group-filter').value, m = document.getElementById('score-month').value, y = document.getElementById('score-year').value;
+        function filterUsersByGroup(autoSelectId = null) {
+            let g = document.getElementById('score-group-filter').value;
+            let m = document.getElementById('score-month').value;
+            let y = document.getElementById('score-year').value;
+            
             let available = cachedUsers.filter(u => {
                 let alreadyScored = currentScoredUsers.includes(String(u.user_id));
                 let isEditingThisUser = (String(u.user_id) === String(currentlyEditingUserId));
                 let isActive = isUserActiveInPeriod(u, m, y);
                 return isActive && (!alreadyScored || isEditingThisUser);
             });
+
             if(g !== "ALL") available = available.filter(u => u.group_name === g);
+
+            // เรียงลำดับรายชื่อตามรหัส (user_id) จากน้อยไปมาก
+            available.sort((a, b) => String(a.user_id).localeCompare(String(b.user_id), 'th', {numeric: true}));
+
             initTomSelect(available);
-            if(currentlyEditingUserId && tomSelectInstance) tomSelectInstance.setValue(currentlyEditingUserId);
+            
+            if(currentlyEditingUserId && tomSelectInstance) {
+                tomSelectInstance.setValue(currentlyEditingUserId);
+            } else if (autoSelectId && tomSelectInstance) {
+                tomSelectInstance.setValue(autoSelectId); // เลือกคนที่ถูกส่งค่ามา (คนถัดไป)
+            } else if (available.length > 0 && tomSelectInstance) {
+                tomSelectInstance.setValue(available[0].user_id); // ถ้าไม่มีอะไร ให้เลือกคนแรกของลิสต์อัตโนมัติ
+            }
         }
 
         function initTomSelect(arr, lock = false) {
             if(tomSelectInstance) tomSelectInstance.destroy();
             let el = document.getElementById('score-user');
-            el.innerHTML = arr.map(u => `<option value="${u.user_id}">${u.name} (${u.group_name})</option>`).join('');
-            tomSelectInstance = new TomSelect(el, { create: false, sortField: { field: "text", direction: "asc" }, placeholder: "คลิกเพื่อเลือก หรือ พิมพ์ชื่อ..." });
+            // นำรหัสมาแสดงนำหน้าชื่อ เพื่อให้เห็นชัดเจน
+            el.innerHTML = arr.map(u => `<option value="${u.user_id}">[${u.user_id}] ${u.name} (${u.group_name})</option>`).join('');
+            tomSelectInstance = new TomSelect(el, { 
+                create: false, 
+                sortField: [{field: '$order'}], // สำคัญ: สั่งให้ TomSelect คงลำดับที่เรา Sort ไว้ (ห้ามเรียง ก-ฮ เอง)
+                placeholder: "คลิกเพื่อเลือก หรือ พิมพ์ชื่อ/รหัส..." 
+            });
             if(lock) tomSelectInstance.disable();
         }
 
@@ -398,49 +418,49 @@
                 raw_score: document.getElementById('raw-score-input').value, 
                 reason: document.getElementById('reason-input').value
             };
-            
             if(!payload.user_id) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกบุคลากร', 'warning');
 
-            // แสดง Loading เบาๆ
-            Swal.fire({
-                title: 'กำลังบันทึก...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+            // --- หาคนถัดไปก่อนที่จะทำการบันทึกและลบคนนี้ออก ---
+            let g = document.getElementById('score-group-filter').value;
+            let m = document.getElementById('score-month').value;
+            let y = document.getElementById('score-year').value;
+            
+            let available = cachedUsers.filter(u => isUserActiveInPeriod(u, m, y) && !currentScoredUsers.includes(String(u.user_id)));
+            if(g !== "ALL") available = available.filter(u => u.group_name === g);
+            available.sort((a, b) => String(a.user_id).localeCompare(String(b.user_id), 'th', {numeric: true}));
+            
+            let currentIndex = available.findIndex(u => String(u.user_id) === String(payload.user_id));
+            let nextUserId = null;
+            if (currentIndex !== -1 && currentIndex + 1 < available.length) {
+                nextUserId = available[currentIndex + 1].user_id; // ได้ ID คนถัดไปเตรียมไว้แล้ว
+            }
+            // --------------------------------------------------
+
+            Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
             let res = await apiCall('saveScore', payload);
             
             if(res.status === 'success') { 
-                // 1. เปลี่ยนการแจ้งเตือนเป็นแบบ Toast (เด้งมุมขวาบน ไม่บล็อกหน้าจอ)
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'บันทึกคะแนนเรียบร้อย',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'บันทึกคะแนนเรียบร้อย', showConfirmButton: false, timer: 1500 });
                 
-                // 2. นำ ID ของคนที่เพิ่งบันทึก ใส่เข้าไปใน Array คนที่กรอกแล้ว (ไม่ต้องรอโหลดจาก Sheet ใหม่)
                 if (!currentScoredUsers.includes(String(payload.user_id))) {
                     currentScoredUsers.push(String(payload.user_id));
                 }
 
-                // 3. ล้างค่าในฟอร์มให้กลับเป็นค่า Default
+                // รีเซ็ตค่าฟอร์มกลับเป็น Default
                 document.getElementById('score-status').value = 'ได้รับ P4P';
                 document.getElementById('raw-score-input').value = '';
                 document.getElementById('reason-input').value = 'ทำงานไม่ครบ 15 วัน';
                 toggleScoreForm();
                 currentlyEditingUserId = null; 
                 
-                // 4. อัปเดต Dropdown ใหม่ทันที (เร็วระดับเสี้ยววินาที)
-                filterUsersByGroup();
+                // โหลดรายชื่อใหม่ พร้อมส่ง ID คนถัดไปให้มันเลือกอัตโนมัติ
+                filterUsersByGroup(nextUserId);
                 
-                // โฟกัสกลับไปที่ Dropdown เพื่อให้พร้อมกรอกคนต่อไปได้เลย
-                if(tomSelectInstance) {
-                    tomSelectInstance.clear();
-                    tomSelectInstance.focus();
-                }
+                // โฟกัสเคอร์เซอร์ไปที่ช่องกรอกคะแนนทันที!
+                setTimeout(() => {
+                    document.getElementById('raw-score-input').focus();
+                }, 100);
 
             } else {
                 Swal.fire('ผิดพลาด', res.message, 'error');
